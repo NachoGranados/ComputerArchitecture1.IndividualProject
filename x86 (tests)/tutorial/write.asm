@@ -8,6 +8,7 @@
 SECTION .data
 filename db 'readme.txt', 0h    ; the filename to create
 contents db 'Hello world!', 0h  ; the contents to write
+ len: equ $-contents
  
 SECTION .text
 global  _start
@@ -19,7 +20,7 @@ _start:
     mov     eax, 8
     int     80h
  
-    mov     edx, 12             ; number of bytes to write - one for each letter of our contents string
+    mov     edx, len             ; number of bytes to write - one for each letter of our contents string
     mov     ecx, contents       ; move the memory address of our contents string into ecx
     mov     ebx, eax            ; move the file descriptor of the file we created into ebx
     mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
