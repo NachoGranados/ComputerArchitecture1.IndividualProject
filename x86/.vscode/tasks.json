@@ -5,11 +5,9 @@
             "label": "build-ASMwithCPP",
             "command": "nasm",
             "args": [
-                "-f",
-                "elf",
-                "-F",
-                "dwarf",
-                "-g",
+                "-felf64",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}.o",
                 "${file}"
             ]
         },
@@ -17,8 +15,6 @@
             "label": "LINK",
             "command": "ld",
             "args": [
-                "-m",
-                "elf_i386",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "${fileDirname}/${fileBasenameNoExtension}.o"
