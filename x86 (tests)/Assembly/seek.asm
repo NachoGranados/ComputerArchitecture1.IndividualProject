@@ -7,8 +7,8 @@
  
 SECTION .data
 filename db 'readme.txt', 0h    ; the filename to create
-contents  db '-updated-', 0h     ; the contents to write at the start of the file
-;contents  db 0ah, 0h     ; the contents to write at the start of the file
+;contents  db '-updated-', 0h     ; the contents to write at the start of the file
+contents  db 0ah, 0h     ; the contents to write at the start of the file
  
 SECTION .text
 global  _start
@@ -27,7 +27,7 @@ _start:
     int     80h                 ; call the kernel
  
     ;mov     edx, 2              ; number of bytes to write - one for each letter of our contents string
-    mov     edx, 9              ; number of bytes to write - one for each letter of our contents string
+    mov     edx, 1              ; number of bytes to write - one for each letter of our contents string
     mov     ecx, contents       ; move the memory address of our contents string into ecx
     mov     ebx, ebx            ; move the opened file descriptor into EBX (not required as EBX already has the FD)
     mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)

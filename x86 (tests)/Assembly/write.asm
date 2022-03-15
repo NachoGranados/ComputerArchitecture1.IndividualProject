@@ -1,11 +1,25 @@
 section .data
 filename: db 'readme.txt', 0h    ; the filename to create
+contents: db 'Buenas mocos', 0h  ; the contents to write
 ;contents: db 'Buenas', 13, 10, 'mocos', 0h  ; the contents to write
-contents: db 'Buenas', 0ah, 'mocos', 0h  ; the contents to write (0ah es equivalente a \n, salto de linea)
+;contents: db 'Buenas', 0ah, 'mocos', 0h  ; the contents to write (0ah es equivalente a \n, salto de linea)
+
+
+; -----------------------------------
+;250x250 = 62500
+
+;1 letra => 5x5 => 50 letras X
+;1 letra real => 6x6 => 41.6 letras X
+
+;252x252 = 63504
+
+;1 letra real => 6x6 => 42 letras
+; -----------------------------------
 
 
 
-vector times 62500 db '1' ; vector formado por 12 bytes inicializadas con 1
+
+vector times 62500 db '1' ; vector formado por 15 bytes inicializadas con 1
 
 
 
@@ -14,7 +28,7 @@ global  _start
 
 _start:
 
-    mov     edx, 250         ; number of bytes to write - one for each letter of our contents string    
+    mov     edx, 62500         ; number of bytes to write - one for each letter of our contents string    
     ;call    strlen          ; call our function to calculate the length of the string 
     ;mov     edx, eax        ; our function leaves the result in EAX
 
@@ -23,9 +37,9 @@ _start:
     mov     eax, 8
     int     80h
         
-    mov     ecx, contents       ; move the memory address of our contents string into ecx
+    ;mov     ecx, contents       ; move the memory address of our contents string into ecx
     ;add     ecx, 5
-    ;mov     ecx, vector       ; move the memory address of our contents string into ecx
+    mov     ecx, vector       ; move the memory address of our contents string into ecx
     mov     ebx, eax            ; move the file descriptor of the file we created into ebx
     mov     eax, 4              ; invoke SYS_WRITE (kernel opcode 4)
     int     80h                 ; call the kernel
@@ -35,6 +49,10 @@ quit:
     mov     eax, 1
     int     80h
  
+
+
+
+
 strlen:                     
     ;mov     ebx, contents        ; move the address of our message string into EBX
     mov     ebx, vector        ; move the address of our message string into EBX
