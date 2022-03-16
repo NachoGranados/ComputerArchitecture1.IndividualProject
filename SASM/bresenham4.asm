@@ -9,10 +9,10 @@ global CMAIN
 
 CMAIN:
     mov rbp, rsp; for correct debugging
-    mov rdi, 1
-    mov rsi, 0
-    mov rdx, 2
-    mov rcx, 1
+    mov rdi, 4
+    mov rsi, 3
+    mov rdx, 4
+    mov rcx, 4
 
 ; rdi = x1
 ; rsi = y1
@@ -35,12 +35,24 @@ _dx:
     
 _abs_dx:
     cmp rbx, 0 ; dx < 0 ?
-    jge _invert_coordinates ; dy >= 0 
+    jge _two_coordinates_dy ; dy >= 0 
     neg rbx ; rbx = abs(dx) => dx
+       
+_two_coordinates_dy:
+    cmp rax, 1 ; dy <= 1 ?
+    jg _two_coordinates_dx; dy > 1
+    
+    jmp _store_two_coordinates
+    
+_two_coordinates_dx:    
+    cmp rbx , 1 ; dx <= 1 ?
+    jg _invert_coordinates; dx > 1    
+   
+    jmp _store_two_coordinates
     
 _invert_coordinates:
-    cmp rbx, rax ; dx <= dy ?
-    jg _loop_variables ; dx > dy ?
+    cmp rbx, rax ; dx < dy ?
+    jge _loop_variables ; dx >= dy ?
     
     mov r8, rdi ; r8 = x1 => aux
     mov rdi, rsi ; x1 = y1
@@ -126,7 +138,25 @@ _for_loop_end:
     add r8, 1 ; i++
     
     jmp _for_loop_start ; for loop
+        
+_store_two_coordinates:
+    mov r8, 0 ; r8 => array offset
+    mov r9, array ; r9 = array address   
 
+    mov [r9 + r8], rdi ; array[0] = x1
+    
+    add r8, 4 ; ofset++    
+    
+    mov [r9 + r8], rsi ; array[1] = y1
+    
+    add r8, 4 ; ofset++
+    
+    mov [r9 + r8], rdx ; array[2] = x2
+    
+    add r8, 4 ; ofset++    
+    
+    mov [r9 + r8], rcx ; array[3] = y2
+      
 _exit:
     mov     rbx, 0
     mov     rax, 1
