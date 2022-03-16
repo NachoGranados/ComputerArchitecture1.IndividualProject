@@ -9,10 +9,10 @@ global CMAIN
 
 CMAIN:
     mov rbp, rsp; for correct debugging
-    mov rdi, 100
-    mov rsi, 110
-    mov rdx, 125
-    mov rcx, 120
+    mov rdi, 1
+    mov rsi, 0
+    mov rdx, 2
+    mov rcx, 1
 
 ; rdi = x1
 ; rsi = y1
