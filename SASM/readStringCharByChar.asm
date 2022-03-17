@@ -59,12 +59,3 @@ _exit:
     mov     eax, 1      ; invoke SYS_EXIT (kernel opcode 1)
     int     80h
     
-    
-    
-    
-    
-    
-    
-    
-    
-    

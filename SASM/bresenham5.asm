@@ -10,10 +10,10 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging
     
-    mov rdi, 0
-    mov rsi, 2
-    mov rdx, 4
-    mov rcx, 2
+    mov rdi, 2
+    mov rsi, 0
+    mov rdx, 2
+    mov rcx, 4
 
 ; rdi = x1
 ; rsi = y1
@@ -36,20 +36,33 @@ _dx:
     
 _abs_dx:
     cmp rbx, 0 ; dx < 0 ?
-    jge _two_coordinates_dy ; dy >= 0 
+    jge _straight_line_dy ; dy >= 0 
+    ;jge _two_coordinates_dy ; dy >= 0 
     neg rbx ; rbx = abs(dx) => dx
        
-_two_coordinates_dy:
-    cmp rax, 1 ; dy <= 1 ?
-    jg _two_coordinates_dx; dy > 1
+;_two_coordinates_dy:
+;    cmp rax, 1 ; dy <= 1 ?
+;    jg _two_coordinates_dx; dy > 1
     
-    jmp _store_two_coordinates
+;    jmp _store_two_coordinates
     
-_two_coordinates_dx:    
-    cmp rbx , 1 ; dx <= 1 ?
-    jg _invert_coordinates; dx > 1    
+;_two_coordinates_dx:    
+;    cmp rbx , 1 ; dx <= 1 ?
+;    jg _invert_coordinates; dx > 1    
    
-    jmp _store_two_coordinates
+;    jmp _store_two_coordinates
+
+_straight_line_dy:
+    cmp rax, 0 ; dy == 0 ?
+    jne _straight_line_dx ; dy != 0
+    
+    jmp _loop_variables
+
+_straight_line_dx:        
+    cmp rbx, 0 ; dx == 0 ?
+    jne _invert_coordinates ; dx != 0
+
+    jmp _loop_variables
     
 _invert_coordinates:
     cmp rbx, rax ; dx < dy ?
@@ -140,23 +153,23 @@ _for_loop_end:
     
     jmp _for_loop_start ; for loop
         
-_store_two_coordinates:
-    mov r8, 0 ; r8 => array offset
-    mov r9, array ; r9 = array address   
+;_store_two_coordinates:
+;    mov r8, 0 ; r8 => array offset
+;    mov r9, array ; r9 = array address   
 
-    mov [r9 + r8], rdi ; array[0] = x1
+;    mov [r9 + r8], rdi ; array[0] = x1
     
-    add r8, 4 ; ofset++    
+;    add r8, 4 ; ofset++    
     
-    mov [r9 + r8], rsi ; array[1] = y1
+;    mov [r9 + r8], rsi ; array[1] = y1
     
-    add r8, 4 ; ofset++
+;    add r8, 4 ; ofset++
     
-    mov [r9 + r8], rdx ; array[2] = x2
+;    mov [r9 + r8], rdx ; array[2] = x2
     
-    add r8, 4 ; ofset++    
+;    add r8, 4 ; ofset++    
     
-    mov [r9 + r8], rcx ; array[3] = y2
+;    mov [r9 + r8], rcx ; array[3] = y2
       
 _exit:
     mov     rbx, 0
