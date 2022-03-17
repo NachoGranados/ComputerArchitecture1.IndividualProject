@@ -1,7 +1,7 @@
 %include "io64.inc"
 
 section .data
-msg db 'Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello World Hello WorldHello World Hello World Hello World Hello World'
+msg db 'Hello'
 
 len: equ $-msg
 
@@ -14,6 +14,8 @@ global CMAIN
 
 CMAIN:
     mov rbp, rsp; for correct debugging
+    
+    mov r14, array
     
     mov r15, len
     
@@ -32,6 +34,8 @@ _loop:
     mov     rbx, 1
     mov     rax, 4
     int     80h
+    
+
     
     add r10, 1
     

@@ -2,17 +2,19 @@
 
 section .data
 
-array times 10 db 0
+array times 10 db 10
 
 section .text
+
 global CMAIN
 
 CMAIN:
+    mov rbp, rsp; for correct debugging
     
-    mov rdi, 3
-    mov rsi, 4
-    mov rdx, 4
-    mov rcx, 3
+    mov rdi, 0
+    mov rsi, 0
+    mov rdx, 0
+    mov rcx, 4
 
 ; rdi = x1
 ; rsi = y1
