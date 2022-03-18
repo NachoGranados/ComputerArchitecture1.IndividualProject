@@ -16,6 +16,7 @@ line times 10 db 10
 matrix times 1500 db '1'
 n equ 250 ; number of columns
 
+pixel db '0'
 ;text db "CARRO"
 
 
@@ -73,11 +74,6 @@ _loops_variables:
     mov rdx, 0 ; rdx => i (matrix variable)
     mov rsi, 4 ; rsi => j (matrix variable)
     
-    ;mov rdi, matrix ; rdi => matrix base address
-    ;mov r8, matrix ; rdi => matrix base address
-    ;mov r9, matrix ; rdi => matrix base address
-    ;mov r10, matrix ; rdi => matrix base address
-    
 _letter_loop_start:
     mov rdi, len ; rdi => len
     cmp rax, rdi ; letter pointer < len ?
@@ -87,6 +83,8 @@ _letter_loop_start:
     mov rdi, [rdi] ; rdi => current letter
     
     mov r8, 0 ; r8 => letter flag
+    mov r9, 0 ; r9 => coordinates offset
+    ;mov r10, coordinates ; r10 => coordinates base address
     
     ; call _cases
     ; CASES DE LAS LETRAS
@@ -95,7 +93,7 @@ _letter_loop_start:
     
 _coordinates_loop_start:
     cmp rbx, r8 ; coordinates pointer < letter flag ?
-    jge _coordinates_loop_end
+    jge _coordinates_loop_end ; coordinates pointer >= letter flag
               
 _store_on_stack:    
     push rax ; preserve rax on the stack
@@ -106,25 +104,28 @@ _store_on_stack:
     push rdi ; preserve rdi on the stack
     push r8 ; preserve r8 on the stack
     
-    mov rax, 0 ; rax => offset
-    mov rbx, coordinates ; rbx => coordinates base address
+    mov rax, coordinates ; rax => coordinates base address
     
-    mov rdi, [rbx] ; cordinates[0] = x1    
-    add rax, 8 ; ofset++    
+    mov rdi, [rax + r9] ; cordinates[ofset] = x1    
+    add r9, 8 ; ofset++    
     
-    mov rsi, [rbx] ; cordinates[1] = y1   
-    add rax, 8 ; ofset++     
+    mov rsi, [rax + r9] ; cordinates[ofset] = y1   
+    add r9, 8 ; ofset++     
     
-    mov rdx, [rbx] ; cordinates[2] = x2
-    add rax, 8 ; ofset++         
+    mov rdx, [rax + r9] ; cordinates[ofset] = x2
+    add r9, 8 ; ofset++         
     
-    mov rcx, [rbx] ; cordinates[3] = y2
+    mov rcx, [rax + r9] ; cordinates[ofset] = y2
+    add r9, 8 ; ofset++
+    
+    push r9 ; preserve r9 on the stack   
                
     ; LLAMAR AL ALGORITMO DE BRESENHAM
     ; call _bresenham
-    ; r10 ALMACENA LA CANTIDAD DE ELEMENTOS QUE TIENE LA VARIABLE "line"
+    ; SE GUARDAN LAS COORDENADAS DE LA LINEA EN LA VARIABLE "line"
         
 _restore_from_stack:       
+    pop r9 ; restore r9 from the stack
     pop r8 ; restore r8 from the stack
     pop rdi ; restore rdi from the stack
     pop rsi ; restore rsi from the stack
@@ -133,163 +134,62 @@ _restore_from_stack:
     pop rbx ; restore rbx from the stack
     pop rax ; restore rax from the stack
     
-    mov r9, line ; r9 => line base address
+    sar r10, 2 ; r10 => number of coordinates of current line
+    mov r11, line ; r9 => line base address    
     
 _line_loop_start:
-    cmp rcx, 10 ; line pointer < 10 ?
-    jge _line_loop_end ; line pointer >= 10
+    cmp rcx, r10 ; line pointer < r10 ?
+    jge _line_loop_end ; line pointer >= r10
     
-_line_loop_if:
-    mov r10, [r9 + rcx] ; r10 = current coordinate
+    mov r12, rcx ; r12 => line pointer
+    imul r12, 8 ; r12 = line pointer * 8
     
-    cmp r10, 0 ; current coordinate == 0 ?
-    jne _line_loop_else
+    mov r13, [r11 + r12] ; r13 = line[line pointer] => x
     
-    cmp rcx, 3 ; line pointer > 3
-    jbe _line_loop_else ; line pointer <= 3
+    add r12, 8 ; line pointer ++
     
+    mov r14, [r11 + r12] ; r14 = line[line pointer] => y
     
+    push rdx ; preserve rsi on the stack
+    push rsi ; preserve rdi on the stack
     
-
-
-
-
-
-
-
-
-_line_loop_else:    
+    add rdx, r13 ; rdx = x + i => i_new
+    sub rsi, r14 ; rsi = j - y => j_new
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    mov r15, n ; r15 => n
+    imul r15, rdx ; r15 = n * i_new
+    add r15, rsi ; r15 = (n * i_new) + j_new
+    
+    pop rsi ; restore rdi from the stack
+    pop rdx ; restore rsi from the stack 
+    
+    mov r13, matrix ; r13 => matrix base address
+    mov r14, pixel ; r14 => pixel
+    
+    mov [r13 + r15], r14 ; matrix[(n * i_new) + j_new] = pixel
+    
+    add rcx, 2 ; coordinates pointer + 2
 
 _line_loop_end:    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    add rdx, 6 ; i + 6
 
     add rbx, 4 ; coordinates pointer + 4
 
-_coordinates_loop_end:   
+_coordinates_loop_end: 
 
+    cmp rax, 41 ; letter pointer > 41 ?
+    jbe _continue ; letter pointer <= 41
     
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    mov rdx, 0 ; i = 0
+    add rsi, 6 ; j + 6
+        
+_continue:            
 
     add rax, 1 ; letter pointer + 1
 
 _letter_loop_end:
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+        
 _exit:
     mov     rbx, 0
     mov     rax, 1
