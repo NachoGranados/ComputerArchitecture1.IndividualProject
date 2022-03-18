@@ -6,8 +6,12 @@ text resb 255 ; variable to store file contents
 
 section .data
 
+;text db 'abc' ; variable to store file contents
+
+filename db 'text.txt', 0h 
+
 ;len equ $-text
-len equ 10
+;len equ 10
 
 coordinates times 10 db 10
 
@@ -19,48 +23,34 @@ n equ 250 ; number of columns
 pixel db '0'
 ;text db "CARRO"
 
-
-
-
-
-
 section .text
 
 global CMAIN
 
 CMAIN:
-
-    ;mov r10, 0 ; r10 => array offset
-    ;mov r11, text ; r11 = array address    
-    
-
-    ;mov rax, [r11] ; array[i] = x1
-    
-    ;add r11, 8 ; ofset++    
-    
-    ;mov rbx, [r11] ; array[i] = x1
-   
-    ;add r11, 8 ; ofset++     
-    
-    ;mov rcx, [r11] ; array[i] = x1
-    
-    ;add r11, 8 ; ofset++         
-    
-    ;mov rdx, [r11] ; array[i] = x1
-   
-    ;add r11, 8 ; ofset++       
-    
-    ;mov rsi, [r11] ; array[i] = x1
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    mov rbp, rsp; for correct debugging    
     ; LEER ARCHIVO DE TEXTO Y GUARDARLO EN LA VARIABLE "text"
+    
+_open_file:
+    mov     rcx, 0
+    mov     rbx, filename
+    mov     rax, 5
+    int     80h
+
+ _read_file: 
+    mov     rdx, 1000; number of bytes to read
+    mov     rcx, text
+    mov     rbx, rax
+    mov     rax, 3
+    int     80h
+ 
+    mov     rax, text   ; move the memory address of our file contents variable into rax for printing   
+    
+    call    _print_string_2            ; call our string printing function
+ 
+    ;call    quit                ; call our quit function    
+    
+    ;jmp _exit
     
     
     
@@ -75,7 +65,17 @@ _loops_variables:
     mov rsi, 4 ; rsi => j (matrix variable)
     
 _letter_loop_start:
-    mov rdi, len ; rdi => len
+    push rax ; preserve rax on the stack
+    
+    mov rax, text
+    
+    call _text_length
+    
+    mov rdi, rax ; rdi => text lenght     
+    
+    pop rax ; restore rax from the stack
+
+;    mov rdi, len ; rdi => len
     cmp rax, rdi ; letter pointer < len ?
     jge _letter_loop_end ; letter pointer >= len
     
@@ -193,4 +193,91 @@ _letter_loop_end:
 _exit:
     mov     rbx, 0
     mov     rax, 1
-    int     80h    
+    int     80h  
+    
+      
+        
+          
+            
+              
+                
+                  
+                    
+                      
+                        
+                          
+                            
+                              
+                                
+                                  
+; rax => string address
+_text_length:
+    push rbx ; preserve rbx on the stack
+      
+    mov rbx, rax ; rbx = rax
+ 
+_text_length_next_char:
+    cmp byte [rax], 0
+    jz _text_length_finished
+    
+    inc rax ; rax ++
+    
+    jmp _text_length_next_char
+ 
+_text_length_finished:
+    sub rax, rbx ; rax = rax - rbx
+    
+    pop rbx ; restore rbx from the stack 
+    
+    ret                                   
+
+_print_string_1:
+    push rdx ; preserve rdx on the stack
+    push rcx ; preserve rcx on the stack
+    push rbx ; preserve rbx on the stack
+    push rax ; preserve rax on the stack
+    
+    call _text_length
+ 
+    mov rdx, rax ; rdx = rax
+    
+    pop rax ; restore rax from the stack 
+ 
+    mov rcx, rax ; rcx = rax
+    mov rbx, 1 ; rbx = 1
+    mov rax, 4 ; rax = 4
+    int 80h
+ 
+    pop rbx ; restore rbx from the stack 
+    pop rcx ; restore rcx from the stack 
+    pop rdx ; restore rdx from the stack 
+    
+    ret
+
+; rax => string address
+_print_string_2:
+    call _print_string_1
+ 
+    push rax ; preserve rax on the stack
+    
+    mov rax, 0AH ; rax = 0AH
+    
+    push rax ; preserve rax on the stack
+    
+    mov rax, rsp ; rax = rsp
+    
+    call _print_string_1
+    
+    pop rax ; restore rax from the stack 
+    pop rax ; restore rax from the stack 
+    
+    ret                                           
+
+                                                    
+                                                      
+                                                        
+                                                          
+                                                            
+                                                              
+                                                                
+                                                                    
