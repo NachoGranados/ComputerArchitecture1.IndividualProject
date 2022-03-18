@@ -3,6 +3,8 @@
 section .data
 msg db 'Hello'
 
+var dd 5
+
 len: equ $-msg
 
 space db 0Ah
@@ -25,7 +27,10 @@ CMAIN:
     
 _loop:
 
-    mov r9, msg ; msg addres
+    mov r9, var ; msg addres
+    
+    mov r15, [var]
+    
     add r9, r8
  
     ; print one letter

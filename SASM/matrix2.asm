@@ -2,16 +2,13 @@
 
 section .bss
 
-text resb 255 ; variable to store file contents
+;text resb 255 ; variable to store file contents
 
 section .data
 
-;text db 'abc' ; variable to store file contents
+text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
 
 filename db 'text.txt', 0h 
-
-;len equ $-text
-;len equ 10
 
 coordinates times 10 db 10
 
@@ -21,7 +18,6 @@ matrix times 1500 db '1'
 n equ 250 ; number of columns
 
 pixel db '0'
-;text db "CARRO"
 
 section .text
 
@@ -30,22 +26,22 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging
     
-_open_file:
-    mov     rcx, 0 ; rcx = 0
-    mov     rbx, filename ; rbx = filename address
-    mov     rax, 5 ; rax = 5
-    int     80h
+;_open_file:
+;    mov     rcx, 0 ; rcx = 0
+;    mov     rbx, filename ; rbx = filename address
+;    mov     rax, 5 ; rax = 5
+;    int     80h
 
-_read_file: 
-    mov     rdx, 1000 ; rdx => number of bytes to read
-    mov     rcx, text ; rcx = text address
-    mov     rbx, rax ; rbx = rax
-    mov     rax, 3 ; rax = 3
-    int     80h
+;_read_file: 
+;    mov     rdx, 1000 ; rdx => number of bytes to read
+;    mov     rcx, text ; rcx = text address
+;    mov     rbx, rax ; rbx = rax
+;    mov     rax, 3 ; rax = 3
+;    int     80h
  
-    mov     rax, text ; rax = text address
+;    mov     rax, text ; rax = text address
     
-    call    _print_string_2
+;    call    _print_string_2
     
     ;jmp _exit
 
@@ -54,8 +50,10 @@ _loops_variables:
     mov rbx, 0 ; rbx => coordinates pointer (coordinates variable)
     mov rcx, 0 ; rcx => line pointer (line variable)
     mov rdx, 0 ; rdx => i (matrix variable)
-    mov rsi, 4 ; rsi => j (matrix variable)
+    mov rsi, 4 ; rsi => j (matrix variable)   
     
+_letter_loop_start:    
+
     push rax ; preserve rax on the stack
     
     mov rax, text ; rax = text address
@@ -64,9 +62,8 @@ _loops_variables:
     
     mov rdi, rax ; rdi => text lenght     
     
-    pop rax ; restore rax from the stack    
-    
-_letter_loop_start:    
+    pop rax ; restore rax from the stack
+
     cmp rax, rdi ; letter pointer < len ?
     jge _letter_loop_end ; letter pointer >= len
     

@@ -1,8 +1,9 @@
 %include "io64.inc"
 
 section .data
-filename: db 'prueba.txt', 0h    ; the filename to create
-contents: db 'Buenas mocos', 0h  ; the contents to write
+filename db 'test.txt', 0h    ; the filename to create
+contents db 'Buenas mocos', 0h  ; the contents to write
+
 ;contents: db 'Buenas', 13, 10, 'mocos', 0h  ; the contents to write
 ;contents: db 'Buenas', 0ah, 'mocos', 0h  ; the contents to write (0ah es equivalente a \n, salto de linea)
 
