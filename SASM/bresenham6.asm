@@ -11,10 +11,10 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging
     
-    mov rdi, 2
+    mov rdi, 1
     mov rsi, 1
-    mov rdx, 2
-    mov rcx, 2
+    mov rdx, 4
+    mov rcx, 4
 
 ; rdi = x1
 ; rsi = y1
@@ -118,22 +118,26 @@ _store_coordinate_1:
        
     mov [r11 + r10], rdi ; array[i] = x1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++
     
     mov [r11 + r10], rsi ; array[i] = y1
    
-    add r10, 4 ; ofset++
+    ;add r10, 4 ; ofset++
+    inc r10 ; ofset++
     
     jmp _increase_x
         
 _store_coordinate_2:
     mov [r11 + r10], rsi ; array[i] = y1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++
     
     mov [r11 + r10], rdi ; array[i] = x1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++
      
 _increase_x:    
     cmp rdi, rdx ; x1 < x2 ?

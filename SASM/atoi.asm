@@ -1,7 +1,7 @@
 %include "io64.inc"
 
 section .data
-str1 db 'HOLA', 0AH
+str1 db '1', 0AH
 ;broj: db ?,?, '$'   
 
 section .text

@@ -6,8 +6,6 @@ section .bss
 
 section .data
 
-text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
-
 filename db 'text.txt', 0h 
 
 ;coordinates times 10 db 10
@@ -47,10 +45,13 @@ coordinatesZ db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 4, 4
 
 line times 10 db 10
 
-matrix times 1500 db '1'
 n equ 250 ; number of columns
 
 pixel db '0'
+
+text db 'Vas ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
+
+matrix times 1500 db '1'
 
 section .text
 
@@ -140,26 +141,35 @@ _store_on_stack:
    ;mov rax, coordinates ; rax => coordinates base address
     mov rax, rdi ; rax => coordinates base address
     
-    mov rdi, [rax + r9] ; cordinates[ofset] = x1    
-    add r9, 8 ; ofset++    
+    ;mov rdi, [rax + r9] ; cordinates[ofset] = x1        
+    ;add r9, 8 ; ofset++    
+    movzx rdi, byte [rax + r9] ; cordinates[ofset] = x1
+    inc r9
     
-    mov rsi, [rax + r9] ; cordinates[ofset] = y1   
-    add r9, 8 ; ofset++     
+    ;mov rsi, [rax + r9] ; cordinates[ofset] = y1       
+    ;add r9, 8 ; ofset++     
+    movzx rsi, byte [rax + r9] ; cordinates[ofset] = y1
+    inc r9
+        
+    ;mov rdx, [rax + r9] ; cordinates[ofset] = x2    
+    ;add r9, 8 ; ofset++         
+    movzx rdx, byte [rax + r9] ; cordinates[ofset] = x2
+    inc r9
     
-    mov rdx, [rax + r9] ; cordinates[ofset] = x2
-    add r9, 8 ; ofset++         
+    ;mov rcx, [rax + r9] ; cordinates[ofset] = y2    
+    ;add r9, 8 ; ofset++
+    movzx rcx, byte [rax + r9] ; cordinates[ofset] = y2
+    inc r9
     
-    mov rcx, [rax + r9] ; cordinates[ofset] = y2
-    add r9, 8 ; ofset++
     
     push r9 ; preserve r9 on the stack   
                
     ; LLAMAR AL ALGORITMO DE BRESENHAM
     
-    mov rdi, 0
-    mov rsi, 2
-    mov rdx, 4
-    mov rcx, 3    
+    ;mov rdi, 0
+    ;mov rsi, 2
+    ;mov rdx, 4
+    ;mov rcx, 3    
     
     call _bresenham
     ; SE GUARDAN LAS COORDENADAS DE LA LINEA EN LA VARIABLE "line"
@@ -175,20 +185,23 @@ _restore_from_stack:
     pop rax ; restore rax from the stack
     
     sar r10, 2 ; r10 => number of coordinates of current line
-    mov r11, line ; r9 => line base address    
+    mov r11, line ; r11 => line base address    
     
 _line_loop_start:
-    cmp rcx, r10 ; line pointer < r10 ?
-    jge _line_loop_end ; line pointer >= r10
+    cmp rcx, r10 ; line pointer < number of coordinates of current line ?
+    jge _line_loop_end ; line pointer >= number of coordinates of current line
     
     mov r12, rcx ; r12 => line pointer
-    imul r12, 8 ; r12 = line pointer * 8
+    ;imul r12, 8 ; r12 = line pointer * 8 ???????????????????????????????????????
     
-    mov r13, [r11 + r12] ; r13 = line[line pointer] => x
+    ;mov r13, [r11 + r12] ; r13 = line[line pointer] => x
+    movzx r13, byte [r11 + r12] ; r13 = line[line pointer] => x
     
-    add r12, 8 ; line pointer ++
+    ;add r12, 8 ; line pointer ++
+    inc r12 ; line pointer ++
     
-    mov r14, [r11 + r12] ; r14 = line[line pointer] => y
+    ;mov r14, [r11 + r12] ; r14 = line[line pointer] => y
+    movzx r14, byte [r11 + r12] ; r14 = line[line pointer] => y
     
     push rdx ; preserve rsi on the stack
     push rsi ; preserve rdi on the stack
@@ -196,21 +209,29 @@ _line_loop_start:
     add rdx, r13 ; rdx = x + i => i_new
     sub rsi, r14 ; rsi = j - y => j_new
     
-    mov r15, n ; r15 => n
-    imul r15, rdx ; r15 = n * i_new
-    add r15, rsi ; r15 = (n * i_new) + j_new
+    ;mov r15, n ; r15 => n
+    ;imul r15, rdx ; r15 = n * i_new
+    ;add r15, rsi ; r15 = (n * i_new) + j_new
+    
+    imul rdx, 4;  rdx = 4 * i_new
+    add rdx, rsi ; rdx = (4 * i_new) + j_new
+    
+    mov r15, rdx ; r15 = (4 * i_new) + j_new
     
     pop rsi ; restore rdi from the stack
     pop rdx ; restore rsi from the stack 
     
     mov r13, matrix ; r13 => matrix base address
-    mov r14, pixel ; r14 => pixel
     
+    mov r14, pixel ; r14 => pixel
+    movzx r14, byte [r14] ; r14 = '0'
     mov [r13 + r15], r14 ; matrix[(n * i_new) + j_new] = pixel
     
     add rcx, 2 ; coordinates pointer + 2
 
-_line_loop_end:    
+_line_loop_end:
+
+   ;mov rcx, 0 ; line pointer = 0 
 
     add rdx, 6 ; i + 6
 
@@ -715,22 +736,26 @@ _bresenham_store_coordinate_1:
        
     mov [r11 + r10], rdi ; array[i] = x1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++    
     
     mov [r11 + r10], rsi ; array[i] = y1
    
-    add r10, 4 ; ofset++
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++
     
     jmp _bresenham_increase_x
         
 _bresenham_store_coordinate_2:
     mov [r11 + r10], rsi ; array[i] = y1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++    
     
     mov [r11 + r10], rdi ; array[i] = x1
     
-    add r10, 4 ; ofset++    
+    ;add r10, 4 ; ofset++    
+    inc r10 ; ofset++    
      
 _bresenham_increase_x:    
     cmp rdi, rdx ; x1 < x2 ?
