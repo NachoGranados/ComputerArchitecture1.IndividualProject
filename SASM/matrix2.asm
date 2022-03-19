@@ -11,7 +11,39 @@ text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte m
 filename db 'text.txt', 0h 
 
 ;coordinates times 10 db 10
-coordinates db 0
+;coordinates db 0
+
+coordinatesComma db 2, 0, 3, 1
+coordinatesPoint db 2, 0, 2, 0
+
+;                        *           *           *           *           *           *
+;               1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
+coordinatesA db 0, 2, 4, 2, 0, 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 4
+coordinatesB db 0, 0, 3, 0, 0, 2, 4, 2, 0, 4, 3, 4, 0, 0, 0, 4, 4, 1, 4, 3
+coordinatesC db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 0, 4
+coordinatesD db 0, 0, 3, 0, 0, 4, 3, 4, 0, 0, 0, 4, 4, 1, 4, 3
+coordinatesE db 0, 0, 4, 0, 0, 2, 3, 2, 0, 4, 4, 4, 0, 0, 0, 4
+coordinatesF db 0, 2, 3, 2, 0, 4, 4, 4, 0, 0, 0, 4
+coordinatesG db 0, 0, 4, 0, 2, 2, 4, 2, 0, 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 2
+coordinatesH db 0, 2, 4, 2, 0, 0, 0, 4, 4, 0, 4, 4
+coordinatesI db 0, 0, 4, 0, 0, 4, 4, 4, 2, 0, 2, 4
+coordinatesJ db 0, 0, 2, 0, 0, 4, 4, 4, 0, 0, 0, 1, 2, 0, 2, 4
+coordinatesK db 0, 0, 0, 4, 0, 1, 3, 4, 0, 3, 3, 0
+coordinatesL db 0, 0, 4, 0, 0, 0, 0, 4
+coordinatesM db 0, 0, 0, 4, 4, 0, 4, 4, 0, 4, 2, 2, 2, 2, 4, 4
+coordinatesN db 0, 0, 0, 4, 4, 0, 4, 4, 0, 4, 4, 0
+coordinatesO db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 4
+coordinatesP db 0, 2, 4, 2, 0, 4, 4, 4, 0, 0, 0, 4, 4, 2, 4, 4
+coordinatesQ db 0, 0, 4, 0, 3, 1, 4, 1, 0, 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 4
+coordinatesR db 0, 2, 4, 2, 0, 4, 4, 4, 0, 0, 0, 4, 4, 2, 4, 4, 2, 2, 4, 0
+coordinatesS db 0, 0, 4, 0, 0, 2, 4, 2, 0, 4, 4, 4, 0, 2, 0, 4, 4, 0, 4, 2
+coordinatesT db 0, 4, 4, 4, 2, 0, 2, 4
+coordinatesU db 0, 0, 4, 0, 0, 0, 0, 4, 4, 0, 4, 4
+coordinatesV db 0, 3, 0, 4, 4, 3, 4, 4, 1, 1, 2, 0, 0, 3, 1, 2, 2, 0, 3, 1, 3, 2, 4, 3
+coordinatesW db 0, 0, 1, 0, 3, 0, 4, 0, 0, 0, 0, 4, 4, 0, 4, 4, 1, 0, 2, 1
+coordinatesX db 0, 0, 4, 4, 0, 4, 4, 0
+coordinatesY db 2, 0, 2, 2, 0, 4, 2, 2, 2, 2, 4, 4
+coordinatesZ db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 4, 4
 
 line times 10 db 10
 
@@ -79,21 +111,14 @@ _letter_loop_start:
     
     mov r8, 0 ; r8 => letter flag
     
-    
-    
-    
-    
-    
     call _letter_cases_start
     
     
     
     ; CASES DE LAS LETRAS
-    ; GUARDAR COODERNADAS EN LA VARIABLE "coordinates"
     ; ASIGNAR EL FLAG DE CADA LETRA QUE ES LA CANTIDAD DE CORDENADAS QUE ESA LETRA TIENE
     
     ; AL FINAL DE LOS CASES, rdi ALMACENARA LA DIRECCION DE MEMORIA DEL ARREGLO DE COORDENADAS DE LA RESPECTIVA LETRA
-    
     
     
     
@@ -112,7 +137,8 @@ _store_on_stack:
     push rdi ; preserve rdi on the stack
     push r8 ; preserve r8 on the stack
     
-    mov rax, coordinates ; rax => coordinates base address
+   ;mov rax, coordinates ; rax => coordinates base address
+    mov rax, rdi ; rax => coordinates base address
     
     mov rdi, [rax + r9] ; cordinates[ofset] = x1    
     add r9, 8 ; ofset++    
@@ -602,7 +628,7 @@ _equal_y:
     jne _next ; y1 != y2
 
     mov rax, 0 ; rax => array offset
-    mov rbx, array ; rbx = array address    
+    mov rbx, line ; rbx = array address    
        
     mov [rbx + rax], rdi ; array[0] = x1
            
