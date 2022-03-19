@@ -10,7 +10,8 @@ text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte m
 
 filename db 'text.txt', 0h 
 
-coordinates times 10 db 10
+;coordinates times 10 db 10
+coordinates db 0
 
 line times 10 db 10
 
@@ -52,8 +53,7 @@ _loops_variables:
     mov rdx, 0 ; rdx => i (matrix variable)
     mov rsi, 4 ; rsi => j (matrix variable)   
     
-_letter_loop_start:    
-
+_letter_loop_start:  
     push rax ; preserve rax on the stack
     
     mov rax, text ; rax = text address
@@ -67,16 +67,37 @@ _letter_loop_start:
     cmp rax, rdi ; letter pointer < len ?
     jge _letter_loop_end ; letter pointer >= len
     
+    
+    
+    
+    
+    
     mov rdi, text ; rdi => text base address
-    mov rdi, [rdi] ; rdi => current letter
+    add rdi, rax ; rdi = text base address + letter pointer
+    
+    movzx rdi, byte [rdi] ; rdi => current letter
     
     mov r8, 0 ; r8 => letter flag
-    mov r9, 0 ; r9 => coordinates offset
     
-    ; call _cases
+    
+    
+    
+    
+    
+    call _letter_cases_start
+    
+    
+    
     ; CASES DE LAS LETRAS
     ; GUARDAR COODERNADAS EN LA VARIABLE "coordinates"
     ; ASIGNAR EL FLAG DE CADA LETRA QUE ES LA CANTIDAD DE CORDENADAS QUE ESA LETRA TIENE
+    
+    ; AL FINAL DE LOS CASES, rdi ALMACENARA LA DIRECCION DE MEMORIA DEL ARREGLO DE COORDENADAS DE LA RESPECTIVA LETRA
+    
+    
+    
+    
+    mov r9, 0 ; r9 => coordinates offset    
     
 _coordinates_loop_start:
     cmp rbx, r8 ; coordinates pointer < letter flag ?
@@ -192,15 +213,351 @@ _exit:
         
           
   
+  
+  
+  
             
-                      
+_print_string_1:
+    push rdx ; preserve rdx on the stack
+    push rcx ; preserve rcx on the stack
+    push rbx ; preserve rbx on the stack
+    push rax ; preserve rax on the stack
+    
+    call _text_length
+ 
+    mov rdx, rax ; rdx = rax
+    
+    pop rax ; restore rax from the stack 
+ 
+    mov rcx, rax ; rcx = rax
+    mov rbx, 1 ; rbx = 1
+    mov rax, 4 ; rax = 4
+    int 80h
+ 
+    pop rbx ; restore rbx from the stack 
+    pop rcx ; restore rcx from the stack 
+    pop rdx ; restore rdx from the stack 
+    
+    ret
+
+; rax = string address
+_print_string_2:
+    call _print_string_1
+ 
+    push rax ; preserve rax on the stack
+    
+    mov rax, 0AH ; rax = 0AH
+    
+    push rax ; preserve rax on the stack
+    
+    mov rax, rsp ; rax = rsp
+    
+    call _print_string_1
+    
+    pop rax ; restore rax from the stack 
+    pop rax ; restore rax from the stack 
+    
+    ret                        
                                 
-                                          
+; rax = string address
+_text_length:
+    push rbx ; preserve rbx on the stack
+      
+    mov rbx, rax ; rbx = rax
+ 
+_text_length_next_char:
+    cmp byte [rax], 0
+    jz _text_length_finished
+    
+    inc rax ; rax ++
+    
+    jmp _text_length_next_char
+ 
+_text_length_finished:
+    sub rax, rbx ; rax = rax - rbx
+    
+    pop rbx ; restore rbx from the stack 
+    
+    ret                                           
                                                     
                                                               
                                                                         
-                                                                                  
+; rdi => current letter
+; r8 => letter flag                                                                                                                                                                                                                                                  
+_letter_cases_start:
+
+_case_A:
+    cmp rdi, 65 ; current letter == 65 (A in ASCII) ?
+    jne _case_B ; current letter != 65 (A in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesA
+        
+    mov rdi, coordinatesA ; rdi => coordinatesA base address
+    
+    jmp _letter_cases_end
+
+_case_B:
+    cmp rdi, 66 ; current letter == 66 (B in ASCII) ?
+    jne _case_C ; current letter != 66 (B in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesB
+        
+    mov rdi, coordinatesB ; rdi => coordinatesB base address
+    
+    jmp _letter_cases_end
+    
+_case_C:
+    cmp rdi, 67 ; current letter == 67 (C in ASCII) ?
+    jne _case_D ; current letter != 67 (C in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesC
+        
+    mov rdi, coordinatesC ; rdi => coordinatesC base address
+    
+    jmp _letter_cases_end
+
+_case_D:
+    cmp rdi, 68 ; current letter == 68 (D in ASCII) ?
+    jne _case_E ; current letter != 68 (D in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesD
+        
+    mov rdi, coordinatesD ; rdi => coordinatesD base address
+    
+    jmp _letter_cases_end
+
+_case_E:
+    cmp rdi, 69 ; current letter == 69 (E in ASCII) ?
+    jne _case_F ; current letter != 69 (E in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesE
+        
+    mov rdi, coordinatesE ; rdi => coordinatesE base address
+    
+    jmp _letter_cases_end
+
+_case_F:
+    cmp rdi, 70 ; current letter == 70 (F in ASCII) ?
+    jne _case_G ; current letter != 70 (F in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesF
+        
+    mov rdi, coordinatesF ; rdi => coordinatesF base address
+    
+    jmp _letter_cases_end
+
+_case_G:
+    cmp rdi, 71 ; current letter == 71 (G in ASCII) ?
+    jne _case_H ; current letter != 71 (G in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesG
+        
+    mov rdi, coordinatesG ; rdi => coordinatesG base address
+    
+    jmp _letter_cases_end
+
+_case_H:
+    cmp rdi, 72 ; current letter == 72 (H in ASCII) ?
+    jne _case_I ; current letter != 72 (H in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesH
+        
+    mov rdi, coordinatesH ; rdi => coordinatesH base address
+    
+    jmp _letter_cases_end
+
+_case_I:
+    cmp rdi, 73 ; current letter == 73 (I in ASCII) ?
+    jne _case_J ; current letter != 73 (I in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesI
+        
+    mov rdi, coordinatesI ; rdi => coordinatesI base address
+    
+    jmp _letter_cases_end
+
+_case_J:
+    cmp rdi, 74 ; current letter == 74 (J in ASCII) ?
+    jne _case_K ; current letter != 74 (J in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesJ
+        
+    mov rdi, coordinatesJ ; rdi => coordinatesJ base address
+    
+    jmp _letter_cases_end
+
+_case_K:
+    cmp rdi, 75 ; current letter == 75 (K in ASCII) ?
+    jne _case_L ; current letter != 75 (K in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesK
+        
+    mov rdi, coordinatesK ; rdi => coordinatesK base address
+    
+    jmp _letter_cases_end
+
+_case_L:
+    cmp rdi, 76 ; current letter == 76 (L in ASCII) ?
+    jne _case_M ; current letter != 76 (L in ASCII) ?
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesL
+        
+    mov rdi, coordinatesL ; rdi => coordinatesL base address
+    
+    jmp _letter_cases_end
+
+_case_M:
+    cmp rdi, 77 ; current letter == 77 (M in ASCII) ?
+    jne _case_N ; current letter != 77 (M in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesM
+        
+    mov rdi, coordinatesM ; rdi => coordinatesM base address
+    
+    jmp _letter_cases_end
+
+_case_N:
+    cmp rdi, 78 ; current letter == 78 (N in ASCII) ?
+    jne _case_O ; current letter != 78 (N in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesN
+        
+    mov rdi, coordinatesN ; rdi => coordinatesN base address
+    
+    jmp _letter_cases_end
+
+_case_O:
+    cmp rdi, 79 ; current letter == 79 (O in ASCII) ?
+    jne _case_P ; current letter != 79 (O in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesO
+        
+    mov rdi, coordinatesO ; rdi => coordinatesO base address
+    
+    jmp _letter_cases_end
+
+_case_P:
+    cmp rdi, 80 ; current letter == 80 (P in ASCII) ?
+    jne _case_Q ; current letter != 80 (P in ASCII) ?
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesP
+        
+    mov rdi, coordinatesP ; rdi => coordinatesP base address
+    
+    jmp _letter_cases_end
+
+_case_Q:
+    cmp rdi, 81 ; current letter == 81 (Q in ASCII) ?
+    jne _case_R ; current letter != 81 (Q in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesQ
+        
+    mov rdi, coordinatesQ ; rdi => coordinatesQ base address
+    
+    jmp _letter_cases_end
+
+_case_R:
+    cmp rdi, 82 ; current letter == 82 (R in ASCII) ?
+    jne _case_S ; current letter != 82 (R in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesR
+        
+    mov rdi, coordinatesR ; rdi => coordinatesR base address
+    
+    jmp _letter_cases_end
+
+_case_S:
+    cmp rdi, 83 ; current letter == 83 (S in ASCII) ?
+    jne _case_T ; current letter != 83 (S in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesS
+        
+    mov rdi, coordinatesS ; rdi => coordinatesS base address
+    
+    jmp _letter_cases_end
+
+_case_T:
+    cmp rdi, 84 ; current letter == 84 (T in ASCII) ?
+    jne _case_U ; current letter != 84 (T in ASCII) ?
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesT
+        
+    mov rdi, coordinatesT ; rdi => coordinatesT base address
+    
+    jmp _letter_cases_end
+
+_case_U:
+    cmp rdi, 85 ; current letter == 85 (U in ASCII) ?
+    jne _case_V ; current letter != 85 (U in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesU
+        
+    mov rdi, coordinatesU ; rdi => coordinatesU base address
+    
+    jmp _letter_cases_end
+
+_case_V:
+    cmp rdi, 86 ; current letter == 86 (V in ASCII) ?
+    jne _case_W ; current letter != 86 (V in ASCII) ?
+    
+    mov r8, 24 ; 12 coordinates or 24 elements in coordinatesV
+        
+    mov rdi, coordinatesV ; rdi => coordinatesV base address
+    
+    jmp _letter_cases_end
+
+_case_W:
+    cmp rdi, 87 ; current letter == 87 (W in ASCII) ?
+    jne _case_X ; current letter != 87 (W in ASCII) ?
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesW
+        
+    mov rdi, coordinatesW ; rdi => coordinatesW base address
+    
+    jmp _letter_cases_end
+
+_case_X:
+    cmp rdi, 88 ; current letter == 88 (X in ASCII) ?
+    jne _case_Y ; current letter != 88 (X in ASCII) ?
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesX
+        
+    mov rdi, coordinatesX ; rdi => coordinatesX base address
+    
+    jmp _letter_cases_end
+
+_case_Y:
+    cmp rdi, 89 ; current letter == 89 (Y in ASCII) ?
+    jne _case_Z ; current letter != 89 (Y in ASCII) ?
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesY
+        
+    mov rdi, coordinatesY ; rdi => coordinatesY base address
+    
+    jmp _letter_cases_end
+
+_case_Z:
+    ; current letter = 90 (Z in ASCII)
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesZ
+        
+    mov rdi, coordinatesZ ; rdi => coordinatesZ base address
+    
+_letter_cases_end:
+    ret
+                                                                                 
+                                                                                                                                                                  
+                                                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                                                                                                                                                                                     
+
                                                                                             
+                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
                                                                                                       
                                                                                                                 
                                                                                                                           
@@ -357,8 +714,8 @@ _bresenham_end:
                                                                                                                                                                                                                     
                                                                                                                                                                                                                               
                                                                                                                                                                                                                                         
-                                                                                                                                                                                                                                                  
-                                                                                                                                                                                                                                                            
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
                                                                                                                                                                                                                                                                       
                                                                                                                                                                                                                                                                                 
                                                                                                                                                                                                                                                                                                     
@@ -373,68 +730,9 @@ _bresenham_end:
                               
                                 
                                   
-; rax = string address
-_text_length:
-    push rbx ; preserve rbx on the stack
-      
-    mov rbx, rax ; rbx = rax
- 
-_text_length_next_char:
-    cmp byte [rax], 0
-    jz _text_length_finished
-    
-    inc rax ; rax ++
-    
-    jmp _text_length_next_char
- 
-_text_length_finished:
-    sub rax, rbx ; rax = rax - rbx
-    
-    pop rbx ; restore rbx from the stack 
-    
-    ret                                   
+                                 
 
-_print_string_1:
-    push rdx ; preserve rdx on the stack
-    push rcx ; preserve rcx on the stack
-    push rbx ; preserve rbx on the stack
-    push rax ; preserve rax on the stack
-    
-    call _text_length
- 
-    mov rdx, rax ; rdx = rax
-    
-    pop rax ; restore rax from the stack 
- 
-    mov rcx, rax ; rcx = rax
-    mov rbx, 1 ; rbx = 1
-    mov rax, 4 ; rax = 4
-    int 80h
- 
-    pop rbx ; restore rbx from the stack 
-    pop rcx ; restore rcx from the stack 
-    pop rdx ; restore rdx from the stack 
-    
-    ret
-
-; rax = string address
-_print_string_2:
-    call _print_string_1
- 
-    push rax ; preserve rax on the stack
-    
-    mov rax, 0AH ; rax = 0AH
-    
-    push rax ; preserve rax on the stack
-    
-    mov rax, rsp ; rax = rsp
-    
-    call _print_string_1
-    
-    pop rax ; restore rax from the stack 
-    pop rax ; restore rax from the stack 
-    
-    ret                                           
+                                        
 
                                                     
                                                       

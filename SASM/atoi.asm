@@ -1,7 +1,7 @@
 %include "io64.inc"
 
 section .data
-str1 db 'A', 0AH
+str1 db 'HOLA', 0AH
 ;broj: db ?,?, '$'   
 
 section .text
@@ -20,17 +20,18 @@ convert:
     test rsi, rsi           ; Check for \0
     je done
     
-    cmp rsi, 48             ; Anything less than 0 is invalid
+    cmp rsi, 0             ; Anything less than 0 is invalid
     jl error
     
-    cmp rsi, 57             ; Anything greater than 9 is invalid
+    cmp rsi, 90             ; Anything greater than 9 is invalid
     jg error
      
     sub rsi, 48             ; Convert from ASCII to decimal 
     imul rax, 10            ; Multiply total by 10
     add rax, rsi            ; Add current digit to total
     
-    inc rdi                 ; Get the address of the next character
+    ;inc rdi                 ; Get the address of the next character
+    add rdi, 1                 ; Get the address of the next character
     jmp convert
 
 error:
