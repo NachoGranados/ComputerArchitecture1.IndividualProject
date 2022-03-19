@@ -14,7 +14,7 @@ CMAIN:
     mov rdi, 2
     mov rsi, 1
     mov rdx, 2
-    mov rcx, 1
+    mov rcx, 2
 
 ; rdi = x1
 ; rsi = y1
@@ -22,6 +22,34 @@ CMAIN:
 ; rcx = y2 
 _bresenham:
 
+_equal_x:
+    cmp rdi, rdx ; x1 == x2 ?
+    jne _next ; x1 != x2
+    
+_equal_y:    
+    cmp rsi, rcx ; y1 == y2 ?
+    jne _next ; y1 != y2
+
+    mov rax, 0 ; rax => array offset
+    mov rbx, array ; rbx = array address    
+       
+    mov [rbx + rax], rdi ; array[0] = x1
+           
+    add rax, 4 ; ofset++    
+            
+    mov [rbx + rax], rsi ; array[1] = y1
+           
+    add rax, 4 ; ofset++    
+           
+    mov [rbx + rax], rdx ; array[2] = x2
+            
+    add rax, 4 ; ofset++    
+           
+    mov [rbx + rax], rcx ; array[3] = y2
+           
+    jmp _exit
+
+_next:
     mov r8, 0 ; r8 => vertical line flag, 0 no, 1 yes
     
 _dy:

@@ -286,9 +286,29 @@ _text_length_finished:
 ; r8 => letter flag                                                                                                                                                                                                                                                  
 _letter_cases_start:
 
+_case_comma:
+    cmp rdi, 44 ; current letter == 44 (, in ASCII) ?
+    jne _case_point ; current letter != 44 (, in ASCII)
+    
+    mov r8, 4 ; 2 coordinates or 4 elements in coordinatesComma
+        
+    mov rdi, coordinatesComma ; rdi => coordinatesComma base address
+    
+    jmp _letter_cases_end
+
+_case_point:
+    cmp rdi, 46 ; current letter == 46 (. in ASCII) ?
+    jne _case_A ; current letter != 46 (. in ASCII)
+    
+    mov r8, 4 ; 2 coordinates or 4 elements in coordinatesPoint
+        
+    mov rdi, coordinatesPoint ; rdi => coordinatesPoint base address
+    
+    jmp _letter_cases_end
+
 _case_A:
     cmp rdi, 65 ; current letter == 65 (A in ASCII) ?
-    jne _case_B ; current letter != 65 (A in ASCII) ?
+    jne _case_B ; current letter != 65 (A in ASCII)
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesA
         
@@ -298,7 +318,7 @@ _case_A:
 
 _case_B:
     cmp rdi, 66 ; current letter == 66 (B in ASCII) ?
-    jne _case_C ; current letter != 66 (B in ASCII) ?
+    jne _case_C ; current letter != 66 (B in ASCII)
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesB
         
@@ -308,7 +328,7 @@ _case_B:
     
 _case_C:
     cmp rdi, 67 ; current letter == 67 (C in ASCII) ?
-    jne _case_D ; current letter != 67 (C in ASCII) ?
+    jne _case_D ; current letter != 67 (C in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesC
         
@@ -318,7 +338,7 @@ _case_C:
 
 _case_D:
     cmp rdi, 68 ; current letter == 68 (D in ASCII) ?
-    jne _case_E ; current letter != 68 (D in ASCII) ?
+    jne _case_E ; current letter != 68 (D in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesD
         
@@ -328,7 +348,7 @@ _case_D:
 
 _case_E:
     cmp rdi, 69 ; current letter == 69 (E in ASCII) ?
-    jne _case_F ; current letter != 69 (E in ASCII) ?
+    jne _case_F ; current letter != 69 (E in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesE
         
@@ -338,7 +358,7 @@ _case_E:
 
 _case_F:
     cmp rdi, 70 ; current letter == 70 (F in ASCII) ?
-    jne _case_G ; current letter != 70 (F in ASCII) ?
+    jne _case_G ; current letter != 70 (F in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesF
         
@@ -348,7 +368,7 @@ _case_F:
 
 _case_G:
     cmp rdi, 71 ; current letter == 71 (G in ASCII) ?
-    jne _case_H ; current letter != 71 (G in ASCII) ?
+    jne _case_H ; current letter != 71 (G in ASCII) 
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesG
         
@@ -358,7 +378,7 @@ _case_G:
 
 _case_H:
     cmp rdi, 72 ; current letter == 72 (H in ASCII) ?
-    jne _case_I ; current letter != 72 (H in ASCII) ?
+    jne _case_I ; current letter != 72 (H in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesH
         
@@ -368,7 +388,7 @@ _case_H:
 
 _case_I:
     cmp rdi, 73 ; current letter == 73 (I in ASCII) ?
-    jne _case_J ; current letter != 73 (I in ASCII) ?
+    jne _case_J ; current letter != 73 (I in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesI
         
@@ -378,7 +398,7 @@ _case_I:
 
 _case_J:
     cmp rdi, 74 ; current letter == 74 (J in ASCII) ?
-    jne _case_K ; current letter != 74 (J in ASCII) ?
+    jne _case_K ; current letter != 74 (J in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesJ
         
@@ -388,7 +408,7 @@ _case_J:
 
 _case_K:
     cmp rdi, 75 ; current letter == 75 (K in ASCII) ?
-    jne _case_L ; current letter != 75 (K in ASCII) ?
+    jne _case_L ; current letter != 75 (K in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesK
         
@@ -398,7 +418,7 @@ _case_K:
 
 _case_L:
     cmp rdi, 76 ; current letter == 76 (L in ASCII) ?
-    jne _case_M ; current letter != 76 (L in ASCII) ?
+    jne _case_M ; current letter != 76 (L in ASCII) 
     
     mov r8, 8 ; 4 coordinates or 8 elements in coordinatesL
         
@@ -408,7 +428,7 @@ _case_L:
 
 _case_M:
     cmp rdi, 77 ; current letter == 77 (M in ASCII) ?
-    jne _case_N ; current letter != 77 (M in ASCII) ?
+    jne _case_N ; current letter != 77 (M in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesM
         
@@ -418,7 +438,7 @@ _case_M:
 
 _case_N:
     cmp rdi, 78 ; current letter == 78 (N in ASCII) ?
-    jne _case_O ; current letter != 78 (N in ASCII) ?
+    jne _case_O ; current letter != 78 (N in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesN
         
@@ -428,7 +448,7 @@ _case_N:
 
 _case_O:
     cmp rdi, 79 ; current letter == 79 (O in ASCII) ?
-    jne _case_P ; current letter != 79 (O in ASCII) ?
+    jne _case_P ; current letter != 79 (O in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesO
         
@@ -438,7 +458,7 @@ _case_O:
 
 _case_P:
     cmp rdi, 80 ; current letter == 80 (P in ASCII) ?
-    jne _case_Q ; current letter != 80 (P in ASCII) ?
+    jne _case_Q ; current letter != 80 (P in ASCII) 
     
     mov r8, 16 ; 8 coordinates or 16 elements in coordinatesP
         
@@ -448,7 +468,7 @@ _case_P:
 
 _case_Q:
     cmp rdi, 81 ; current letter == 81 (Q in ASCII) ?
-    jne _case_R ; current letter != 81 (Q in ASCII) ?
+    jne _case_R ; current letter != 81 (Q in ASCII) 
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesQ
         
@@ -458,7 +478,7 @@ _case_Q:
 
 _case_R:
     cmp rdi, 82 ; current letter == 82 (R in ASCII) ?
-    jne _case_S ; current letter != 82 (R in ASCII) ?
+    jne _case_S ; current letter != 82 (R in ASCII) 
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesR
         
@@ -468,7 +488,7 @@ _case_R:
 
 _case_S:
     cmp rdi, 83 ; current letter == 83 (S in ASCII) ?
-    jne _case_T ; current letter != 83 (S in ASCII) ?
+    jne _case_T ; current letter != 83 (S in ASCII) 
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesS
         
@@ -478,7 +498,7 @@ _case_S:
 
 _case_T:
     cmp rdi, 84 ; current letter == 84 (T in ASCII) ?
-    jne _case_U ; current letter != 84 (T in ASCII) ?
+    jne _case_U ; current letter != 84 (T in ASCII) 
     
     mov r8, 8 ; 4 coordinates or 8 elements in coordinatesT
         
@@ -488,7 +508,7 @@ _case_T:
 
 _case_U:
     cmp rdi, 85 ; current letter == 85 (U in ASCII) ?
-    jne _case_V ; current letter != 85 (U in ASCII) ?
+    jne _case_V ; current letter != 85 (U in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesU
         
@@ -498,7 +518,7 @@ _case_U:
 
 _case_V:
     cmp rdi, 86 ; current letter == 86 (V in ASCII) ?
-    jne _case_W ; current letter != 86 (V in ASCII) ?
+    jne _case_W ; current letter != 86 (V in ASCII) 
     
     mov r8, 24 ; 12 coordinates or 24 elements in coordinatesV
         
@@ -508,7 +528,7 @@ _case_V:
 
 _case_W:
     cmp rdi, 87 ; current letter == 87 (W in ASCII) ?
-    jne _case_X ; current letter != 87 (W in ASCII) ?
+    jne _case_X ; current letter != 87 (W in ASCII) 
     
     mov r8, 20 ; 10 coordinates or 20 elements in coordinatesW
         
@@ -518,7 +538,7 @@ _case_W:
 
 _case_X:
     cmp rdi, 88 ; current letter == 88 (X in ASCII) ?
-    jne _case_Y ; current letter != 88 (X in ASCII) ?
+    jne _case_Y ; current letter != 88 (X in ASCII) 
     
     mov r8, 8 ; 4 coordinates or 8 elements in coordinatesX
         
@@ -528,7 +548,7 @@ _case_X:
 
 _case_Y:
     cmp rdi, 89 ; current letter == 89 (Y in ASCII) ?
-    jne _case_Z ; current letter != 89 (Y in ASCII) ?
+    jne _case_Z ; current letter != 89 (Y in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesY
         
@@ -572,6 +592,35 @@ _letter_cases_end:
 ; rdx = x2 
 ; rcx = y2 
 _bresenham:
+
+_equal_x:
+    cmp rdi, rdx ; x1 == x2 ?
+    jne _next ; x1 != x2
+    
+_equal_y:    
+    cmp rsi, rcx ; y1 == y2 ?
+    jne _next ; y1 != y2
+
+    mov rax, 0 ; rax => array offset
+    mov rbx, array ; rbx = array address    
+       
+    mov [rbx + rax], rdi ; array[0] = x1
+           
+    add rax, 4 ; ofset++    
+            
+    mov [rbx + rax], rsi ; array[1] = y1
+           
+    add rax, 4 ; ofset++    
+           
+    mov [rbx + rax], rdx ; array[2] = x2
+            
+    add rax, 4 ; ofset++    
+           
+    mov [rbx + rax], rcx ; array[3] = y2
+           
+    ret
+
+_next:
     mov r8, 0 ; r8 => vertical line flag, 0 no, 1 yes
     
 _bresenham_dy:

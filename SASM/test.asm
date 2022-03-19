@@ -25,6 +25,13 @@ CMAIN:
     mov rdx, 15
     mov rcx, 5
     
+    mov rax, 3
+    mov rbx, 0
+    and rax, rbx
+    
+    
+    
+    
     mov rax, [str1]
     mov rbx, [str2]
     lea rcx, [str3]
