@@ -1,7 +1,7 @@
 %include "io64.inc"
 
 section .data
-filename db 'text.txt', 0h    ; the filename to create
+filename db 'input.txt', 0h    ; the filename to create
 contents db 'Hello world!', 0h  ; the contents to write
 
 SECTION .bss

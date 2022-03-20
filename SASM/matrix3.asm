@@ -10,9 +10,9 @@ n equ 250 ; number of columns
 
 pixel db '0'
 
-;matrix times 62500 db '1'
+matrix times 62500 db '-'
 
-text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
+text db 'LAS BALLENAS SON UNOS ENORMES ANIMALES QUE PUEDEN ALCANZAR LOS VEINTE METROS DE LARGO. A PESAR DE SU TAMANO, SE ALIMENTAN DE PLANCTON. EL PLANCTON ESTA FORMADO POR PEQUENOS ANIMALES QUE VIVEN EN LA SUPERFICIE DEL MAR. LO FORMAN MILLONES DE LARVAS QUE CUANDO SE HACEN GRANDES SE TRANSFORMAN EN CANGREJOS, GAMBAS, ETC. LA BALLENA, PARA COMERLOS, ABRE LA BOCA Y TRAGA UNA GRAN CANTIDAD DE AGUA. EL AGUA ES FILTRADA Y DEVUELTA AL MAR. EL PLANCTON QUEDA ATRAPADO EN UNA ESPECIE DE FILTRO Y LE SIRVE DE ALIMENTO. LUEGO VUELVE A TRAGAR OTRA GRAN CANTIDAD DE AGUA Y ASI MUCHAS VECES. DE ESTA FORMA, EL ANIMAL MAS GRANDE DE LA TIERRA, SE ALIMENTA DE UNOS ANIMALITOS TAN PEQUENOS, QUE ES DIFICIL VERLOS A SIMPLE VISTA.' ; variable to store file contents
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
@@ -70,26 +70,46 @@ section .text
 global CMAIN
 
 CMAIN:
-    mov rbp, rsp; for correct debugging
+    mov rbp, rsp; for correct debugging  
     
 _read_input_text_file: 
-    mov     rdx, 1000 ; rdx => number of bytes to read
-    mov     rcx, inputFileName ; rcx = inputFileName address
-    mov     rbx, rax ; rbx = rax
-    mov     rax, 3 ; rax = 3
-    int     80h ; call the kernel
+    ;mov     rcx, 0 ; rcx = 0
+    ;mov     rbx, inputFileName ; rcx = inputFileName address
+    ;mov     rax, 5 ; rax = 5
+    ;int     80h ; call the kernel
+
+    ;mov     rdx, 1000 ; rdx => number of bytes to read
+    ;mov     rcx, inputFileName ; rcx = inputFileName address
+    ;mov     rbx, rax ; rbx = rax
+    ;mov     rax, 3 ; rax = 3
+    ;int     80h ; call the kernel
  
-    mov     rax, text ; rax = text address
+    ;mov     rax, text ; rax = text address
    
-    call    _print_string_2  
-    
-    ;jmp _exit  
-        
+    ;call    _print_string_2   
+            
 _create_output_text_file:
     mov     rcx, 0777o ; rcx = 0777o
     mov     rbx, outputFileName ; rbx = filename address
     mov     rax, 8 ; rax = 8
     int     80h ; call the kernel
+    
+_write_output_text_file:
+    mov rdx, 62500 ; rdx = number of bytes to write
+    mov rcx, matrix ; rcx = matrix base address
+    mov rbx, rax ; rbx = file descriptor
+    mov rax, 4 ; rax = SYS_WRITE
+    int 80h ; call the kernel   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 ;_open_output_text_file:
 ;    mov     rcx, 0 ; rcx = 0
@@ -100,6 +120,21 @@ _create_output_text_file:
 
     
     ;jmp _exit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 _loops_variables:      
     mov rax, 0 ; rax => letter pointer (text variable)
@@ -133,7 +168,26 @@ _letter_loop_start:
     
     movzx rdi, byte [rdi] ; rdi => current letter
     
+    cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
+    jne _pass ; current letter != 32 (" " in ASCII)
+    
+    jmp _coordinates_loop_end
+      
+    
+    
+_pass:    
     mov r8, 0 ; r8 => letter flag
+    
+    
+    
+  
+    
+    
+    
+    
+    
+    
+    
     
     call _letter_cases_start
     
@@ -280,7 +334,7 @@ _line_loop_start:
     pop rbx ; restore rbx from the stack
     pop rax ; restore rax from the stack
     
-    add rcx, 2 ; coordinates pointer + 2
+    add rcx, 2 ; line pointer + 2
     
     jmp _line_loop_start
 
@@ -295,6 +349,8 @@ _line_loop_end:
     jmp _coordinates_loop_start
 
 _coordinates_loop_end:
+
+    mov rbx, 0 ; coordinates pointer = 0
 
     add rax, 1 ; letter pointer + 1
 
