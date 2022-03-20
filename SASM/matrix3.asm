@@ -10,11 +10,12 @@ n equ 250 ; number of columns
 
 pixel db '0'
 
-matrix times 62500 db '1'
+;matrix times 62500 db '1'
 
 text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
 
-filename db 'text.txt', 0h 
+inputFileName db 'input.txt', 0h
+outputFileName db 'output.txt', 0h 
 
 ;coordinates times 10 db 10
 ;coordinates db 0
@@ -37,8 +38,8 @@ coordinatesJ db 0, 0, 2, 0, 0, 4, 4, 4, 0, 0, 0, 1, 2, 0, 2, 4
 coordinatesK db 0, 0, 0, 4, 0, 1, 3, 4, 0, 3, 3, 0
 
 
-;coordinatesL db 0, 0, 4, 0, 0, 0, 0, 4
-coordinatesL db 0, 0, 4, 0, 0, 1, 0, 4
+coordinatesL db 0, 0, 4, 0, 0, 0, 0, 4
+;coordinatesL db 0, 0, 4, 0, 0, 1, 0, 4
 
 
 
@@ -71,22 +72,32 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging
     
-;_open_file:
-;    mov     rcx, 0 ; rcx = 0
-;    mov     rbx, filename ; rbx = filename address
-;    mov     rax, 5 ; rax = 5
-;    int     80h
-
-;_read_file: 
-;    mov     rdx, 1000 ; rdx => number of bytes to read
-;    mov     rcx, text ; rcx = text address
-;    mov     rbx, rax ; rbx = rax
-;    mov     rax, 3 ; rax = 3
-;    int     80h
+_read_input_text_file: 
+    mov     rdx, 1000 ; rdx => number of bytes to read
+    mov     rcx, inputFileName ; rcx = inputFileName address
+    mov     rbx, rax ; rbx = rax
+    mov     rax, 3 ; rax = 3
+    int     80h ; call the kernel
  
-;    mov     rax, text ; rax = text address
+    mov     rax, text ; rax = text address
+   
+    call    _print_string_2  
     
-;    call    _print_string_2
+    ;jmp _exit  
+        
+_create_output_text_file:
+    mov     rcx, 0777o ; rcx = 0777o
+    mov     rbx, outputFileName ; rbx = filename address
+    mov     rax, 8 ; rax = 8
+    int     80h ; call the kernel
+    
+;_open_output_text_file:
+;    mov     rcx, 0 ; rcx = 0
+;    mov     rbx, outputFileName ; rbx = filename address
+;    mov     rax, 5 ; rax = 5
+;    int     80h ; call the kernel
+
+
     
     ;jmp _exit
 
@@ -220,7 +231,7 @@ _line_loop_start:
     
     add rdx, r13 ; rdx = x + i => i_new
     
-    mov r15, n
+    mov r15, n ; r15 = n
     imul r14, r15 ; r14 = n * y
     sub rsi, r14 ; rsi = j - (n * y) => j_new
     
@@ -233,28 +244,41 @@ _line_loop_start:
     add rdx, rsi ; rdx = i_new + j_new
     
     ;mov r15, rdx ; r15 = (4 * i_new) + j_new
-    mov r15, rdx ; r15 = i_new + j_new
+    mov r13, rdx ; r13 = i_new + j_new
     
     pop rsi ; restore rdi from the stack
     pop rdx ; restore rsi from the stack 
     
-    mov r13, matrix ; r13 => matrix base address
+    ;mov r13, matrix ; r13 => matrix base address
     
-    mov r14, pixel ; r14 => pixel
-    movzx r14, byte [r14] ; r14 = '0'
+    ;mov r14, pixel ; r14 => pixel
+    ;movzx r14, byte [r14] ; r14 = '0'
     ;mov r14, 5
     
     ;mov r12, 0
     ;add r12, r13
     ;add r12, r15
     
-    push r13
+    ;push r13
     
-    add r13, r15
+    ;add r13, r15
     
-    pop r13
+    ;pop r13
     
-    mov [r13 + r15], r14 ; matrix[i_new + j_new] = pixel
+    ;mov [r13 + r15], r14 ; matrix[i_new + j_new] = pixel
+    
+    push rax ; preserve rax on the stack
+    push rbx ; preserve rbx on the stack
+    push rcx ; preserve rcx on the stack
+    push rdx ; preserve rdx on the stack    
+   
+    ;mov [r13 + r15], r14 ; matrix[i_new + j_new] = pixel 
+    call _update_output_file   
+    
+    pop rdx ; restore rdx from the stack
+    pop rcx ; restore rcx from the stack
+    pop rbx ; restore rbx from the stack
+    pop rax ; restore rax from the stack
     
     add rcx, 2 ; coordinates pointer + 2
     
@@ -304,7 +328,8 @@ _coordinates_loop_end:
     mov rdx, 0 ; i = 0
     add rsi, 1500 ; j + 1500
             
-_continue:            
+_continue:              
+
     ;add rax, 1 ; letter pointer + 1
             
     jmp _letter_loop_start
@@ -339,7 +364,7 @@ _print_string_1:
     mov rcx, rax ; rcx = rax
     mov rbx, 1 ; rbx = 1
     mov rax, 4 ; rax = 4
-    int 80h
+    int 80h ; call the kernel
  
     pop rbx ; restore rbx from the stack 
     pop rcx ; restore rcx from the stack 
@@ -817,7 +842,7 @@ _bresenham_store_coordinate_2:
     ;add r10, 4 ; ofset++    
     inc r10 ; ofset++    
      
-_bresenham_increase_x:    
+_bresenham_increase_x:     
     cmp rdi, rdx ; x1 < x2 ?
     jge _bresenham_decrease_x ; x1 >= x2
     
@@ -875,9 +900,26 @@ _bresenham_end:
                                                                                                                                                                                                                               
                                                                                                                                                                                                                                         
 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                      
-                                                                                                                                                                                                                                                                                
+; r13 => numer of bytes move the cursor                                                                                                                                                                                                                                                                         
+_update_output_file:
+    mov     rcx, 1 ; rcx = write only access mode
+    mov     rbx, outputFileName ; rbx = outputFileName base address
+    mov     rax, 5 ; rax = SYS_OPEN
+    int     80h ; call the kernel
+ 
+    mov     rdx, 0 ; rdx = SEEK_SET
+    mov     rcx, r13 ; rcx = r13 => move the cursor 0 bytes
+    mov     rbx, rax ; rbx = opened file descriptor
+    mov     rax, 19 ; rax = SYS_LSEEK
+    int     80h ; call the kernel
+ 
+    mov     rdx, 1 ; rdx = number of bytes to write
+    mov     rcx, pixel ; rcx = string base address
+    mov     rbx, rbx ; rbx = opened file descriptor
+    mov     rax, 4 ; rax = SYS_WRITE
+    int     80h ; call the kernel
+    
+    ret                                                                                                                                                                                                                                                                                  
                                                                                                                                                                                                                                                                                                     
               
                 
@@ -888,7 +930,11 @@ _bresenham_end:
                           
                             
                               
-                                
+     ;_open_output_text_file:
+;    mov     rcx, 0 ; rcx = 0
+;    mov     rbx, outputFileName ; rbx = filename address
+;    mov     rax, 5 ; rax = 5
+;    int     80h                           
                                   
                                  
 

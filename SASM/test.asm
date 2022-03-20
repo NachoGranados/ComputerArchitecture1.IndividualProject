@@ -20,10 +20,17 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging
 
-    mov rdi, 3
-    mov rsi, 2
-    mov rdx, 15
-    mov rcx, 5
+    mov rax, 80 ; dividendo
+    mov rdx, 0 ; residuo
+    
+    mov rbx, 41 ; divisor
+    
+    div ebx
+    
+    
+    
+    
+    
     
     mov rax, 3
     mov rbx, 0
