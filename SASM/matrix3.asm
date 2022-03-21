@@ -2,7 +2,7 @@
 
 section .bss
 
-;text resb 255 ; variable to store file contents
+text resb 1700 ; variable to store file contents
 
 section .data
 
@@ -12,13 +12,8 @@ pixel db '0'
 
 matrix times 62500 db '`'
 
-text db 'LAS BALLENAS SON UNOS ENORMES ANIMALES QUE PUEDEN ALCANZAR LOS VEINTE METROS DE LARGO. A PESAR DE SU TAMANO, SE ALIMENTAN DE PLANCTON. EL PLANCTON ESTA FORMADO POR PEQUENOS ANIMALES QUE VIVEN EN LA SUPERFICIE DEL MAR. LO FORMAN MILLONES DE LARVAS QUE CUANDO SE HACEN GRANDES SE TRANSFORMAN EN CANGREJOS, GAMBAS, ETC. LA BALLENA, PARA COMERLOS, ABRE LA BOCA Y TRAGA UNA GRAN CANTIDAD DE AGUA. EL AGUA ES FILTRADA Y DEVUELTA AL MAR. EL PLANCTON QUEDA ATRAPADO EN UNA ESPECIE DE FILTRO Y LE SIRVE DE ALIMENTO. LUEGO VUELVE A TRAGAR OTRA GRAN CANTIDAD DE AGUA Y ASI MUCHAS VECES. DE ESTA FORMA, EL ANIMAL MAS GRANDE DE LA TIERRA, SE ALIMENTA DE UNOS ANIMALITOS TAN PEQUENOS, QUE ES DIFICIL VERLOS A SIMPLE VISTA.' ; variable to store file contents
-
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
-
-;coordinates times 10 db 10
-;coordinates db 0
 
 coordinatesComma db 2, 0, 3, 1
 coordinatesPoint db 1, 0, 2, 0, 1, 1, 2, 1
@@ -36,14 +31,7 @@ coordinatesH db 0, 2, 4, 2, 0, 0, 0, 4, 4, 0, 4, 4
 coordinatesI db 0, 0, 4, 0, 0, 4, 4, 4, 2, 0, 2, 4
 coordinatesJ db 0, 0, 2, 0, 0, 4, 4, 4, 0, 0, 0, 1, 2, 0, 2, 4
 coordinatesK db 0, 0, 0, 4, 0, 1, 3, 4, 0, 3, 3, 0
-
-
 coordinatesL db 0, 0, 4, 0, 0, 0, 0, 4
-;coordinatesL db 0, 0, 4, 0, 0, 1, 0, 4
-
-
-
-
 coordinatesM db 0, 0, 0, 4, 4, 0, 4, 4, 0, 4, 2, 2, 2, 2, 4, 4
 coordinatesN db 0, 0, 0, 4, 4, 0, 4, 4, 0, 4, 4, 0
 coordinatesO db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 0, 4, 4, 0, 4, 4
@@ -61,10 +49,6 @@ coordinatesZ db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 4, 4
 
 line times 10 db 10
 
-;text db 'Las ballenas son unos enormes animales que pueden alcanzar los veinte metros de largo. A pesar de su tamano, se alimentan de plancton. El plancton esta formado por pequenos animales que viven en la superficie del mar. Lo forman millones de larvas que cuando se hacen grandes se transforman en cangrejos, gambas, etc. La ballena, para comerlos, abre la boca y traga una gran cantidad de agua. El agua es filtrada y devuelta al mar. El plancton queda atrapado en una especie de filtro y le sirve de alimento. Luego vuelve a tragar otra gran cantidad de agua y asi muchas veces. De esta forma, el animal mas grande de la tierra, se alimenta de unos animalitos tan pequenos, que es dificil verlos a simple vista.' ; variable to store file contents
-
-;matrix times 1500 db '1'
-
 section .text
 
 global CMAIN
@@ -72,22 +56,6 @@ global CMAIN
 CMAIN:
     mov rbp, rsp; for correct debugging  
     
-_read_input_text_file: 
-    ;mov     rcx, 0 ; rcx = 0
-    ;mov     rbx, inputFileName ; rcx = inputFileName address
-    ;mov     rax, 5 ; rax = 5
-    ;int     80h ; call the kernel
-
-    ;mov     rdx, 1000 ; rdx => number of bytes to read
-    ;mov     rcx, inputFileName ; rcx = inputFileName address
-    ;mov     rbx, rax ; rbx = rax
-    ;mov     rax, 3 ; rax = 3
-    ;int     80h ; call the kernel
- 
-    ;mov     rax, text ; rax = text address
-   
-    ;call    _print_string_2   
-            
 _create_output_text_file:
     mov     rcx, 0777o ; rcx = 0777o
     mov     rbx, outputFileName ; rbx = filename address
@@ -99,43 +67,32 @@ _write_output_text_file:
     mov rcx, matrix ; rcx = matrix base address
     mov rbx, rax ; rbx = file descriptor
     mov rax, 4 ; rax = SYS_WRITE
-    int 80h ; call the kernel   
+    int 80h ; call the kernel
     
+    mov     rbx, rbx ; rbx = rbx
+    mov     rax, 6 ; rax = SYS_CLOSE
+    int     80h ; call the kernel     
     
+_read_input_text_file: 
+    mov     rcx, 0 ; rcx = 0
+    mov     rbx, inputFileName ; rcx = inputFileName address
+    mov     rax, 5 ; rax = 5
+    int     80h ; call the kernel
+
+    mov     rdx, 1000 ; rdx => number of bytes to read
+    mov     rcx, text ; rcx = inputFileName address
+    mov     rbx, rax ; rbx = rax
+    mov     rax, 3 ; rax = 3
+    int     80h ; call the kernel
+ 
+    mov     rax, text ; rax = text address
+   
+    call    _print_string_2 
     
-    
-    
-    
-    
-    
-    
-    
-    
-;_open_output_text_file:
-;    mov     rcx, 0 ; rcx = 0
-;    mov     rbx, outputFileName ; rbx = filename address
-;    mov     rax, 5 ; rax = 5
-;    int     80h ; call the kernel
-
-
-    
-    ;jmp _exit
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    mov     rbx, rbx ; rbx = rbx
+    mov     rax, 6 ; rax = SYS_CLOSE
+    int     80h ; call the kernel                    
+          
 _loops_variables:      
     mov rax, 0 ; rax => letter pointer (text variable)
     mov rbx, 0 ; rbx => coordinates pointer (coordinates variable)
@@ -396,7 +353,7 @@ _letter_loop_end:
 _exit:
     mov rbx, 0 ; rbx = 0
     mov rax, 1; rax = 1
-    int 80h  
+    int 80h ; call the kernel
     
       
         
@@ -746,12 +703,272 @@ _case_Y:
     jmp _letter_cases_end
 
 _case_Z:
-    ; current letter = 90 (Z in ASCII)
+    cmp rdi, 90 ; current letter == 90 (Z in ASCII) ?
+    jne _case_a ; current letter != 90 (Z in ASCII) 
     
     mov r8, 12 ; 6 coordinates or 12 elements in coordinatesZ
         
     mov rdi, coordinatesZ ; rdi => coordinatesZ base address
     
+    jmp _letter_cases_end    
+    
+_case_a:
+    cmp rdi, 97 ; current letter == 97 (a in ASCII) ?
+    jne _case_b ; current letter != 97 (a in ASCII)
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesA
+        
+    mov rdi, coordinatesA ; rdi => coordinatesA base address
+    
+    jmp _letter_cases_end
+
+_case_b:
+    cmp rdi, 98 ; current letter == 98 (b in ASCII) ?
+    jne _case_c ; current letter != 98 (b in ASCII)
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesB
+        
+    mov rdi, coordinatesB ; rdi => coordinatesB base address
+    
+    jmp _letter_cases_end
+    
+_case_c:
+    cmp rdi, 99 ; current letter == 99 (c in ASCII) ?
+    jne _case_d ; current letter != 99 (c in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesC
+        
+    mov rdi, coordinatesC ; rdi => coordinatesC base address
+    
+    jmp _letter_cases_end
+
+_case_d:
+    cmp rdi, 100 ; current letter == 100 (d in ASCII) ?
+    jne _case_e ; current letter != 100 (d in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesD
+        
+    mov rdi, coordinatesD ; rdi => coordinatesD base address
+    
+    jmp _letter_cases_end
+
+_case_e:
+    cmp rdi, 101 ; current letter == 101 (e in ASCII) ?
+    jne _case_f ; current letter != 101 (e in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesE
+        
+    mov rdi, coordinatesE ; rdi => coordinatesE base address
+    
+    jmp _letter_cases_end
+
+_case_f:
+    cmp rdi, 102 ; current letter == 102 (f in ASCII) ?
+    jne _case_g ; current letter != 102 (f in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesF
+        
+    mov rdi, coordinatesF ; rdi => coordinatesF base address
+    
+    jmp _letter_cases_end
+
+_case_g:
+    cmp rdi, 103 ; current letter == 103 (g in ASCII) ?
+    jne _case_h ; current letter != 103 (g in ASCII) 
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesG
+        
+    mov rdi, coordinatesG ; rdi => coordinatesG base address
+    
+    jmp _letter_cases_end
+
+_case_h:
+    cmp rdi, 104 ; current letter == 104 (h in ASCII) ?
+    jne _case_i ; current letter != 104 (h in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesH
+        
+    mov rdi, coordinatesH ; rdi => coordinatesH base address
+    
+    jmp _letter_cases_end
+
+_case_i:
+    cmp rdi, 105 ; current letter == 105 (i in ASCII) ?
+    jne _case_j ; current letter != 105 (i in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesI
+        
+    mov rdi, coordinatesI ; rdi => coordinatesI base address
+    
+    jmp _letter_cases_end
+
+_case_j:
+    cmp rdi, 106 ; current letter == 106 (j in ASCII) ?
+    jne _case_k ; current letter != 106 (j in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesJ
+        
+    mov rdi, coordinatesJ ; rdi => coordinatesJ base address
+    
+    jmp _letter_cases_end
+
+_case_k:
+    cmp rdi, 107 ; current letter == 107 (k in ASCII) ?
+    jne _case_l ; current letter != 107 (k in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesK
+        
+    mov rdi, coordinatesK ; rdi => coordinatesK base address
+    
+    jmp _letter_cases_end
+
+_case_l:
+    cmp rdi, 108 ; current letter == 108 (l in ASCII) ?
+    jne _case_m ; current letter != 108 (l in ASCII) 
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesL
+        
+    mov rdi, coordinatesL ; rdi => coordinatesL base address
+    
+    jmp _letter_cases_end
+
+_case_m:
+    cmp rdi, 109 ; current letter == 109 (m in ASCII) ?
+    jne _case_n ; current letter != 109 (m in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesM
+        
+    mov rdi, coordinatesM ; rdi => coordinatesM base address
+    
+    jmp _letter_cases_end
+
+_case_n:
+    cmp rdi, 110 ; current letter == 110 (n in ASCII) ?
+    jne _case_o ; current letter != 110 (n in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesN
+        
+    mov rdi, coordinatesN ; rdi => coordinatesN base address
+    
+    jmp _letter_cases_end
+
+_case_o:
+    cmp rdi, 111 ; current letter == 111 (o in ASCII) ?
+    jne _case_p ; current letter != 111 (o in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesO
+        
+    mov rdi, coordinatesO ; rdi => coordinatesO base address
+    
+    jmp _letter_cases_end
+
+_case_p:
+    cmp rdi, 112 ; current letter == 112 (p in ASCII) ?
+    jne _case_q ; current letter != 112 (p in ASCII) 
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesP
+        
+    mov rdi, coordinatesP ; rdi => coordinatesP base address
+    
+    jmp _letter_cases_end
+
+_case_q:
+    cmp rdi, 113 ; current letter == 113 (q in ASCII) ?
+    jne _case_r ; current letter != 113 (q in ASCII) 
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesQ
+        
+    mov rdi, coordinatesQ ; rdi => coordinatesQ base address
+    
+    jmp _letter_cases_end
+
+_case_r:
+    cmp rdi, 114 ; current letter == 114 (r in ASCII) ?
+    jne _case_s ; current letter != 114 (r in ASCII) 
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesR
+        
+    mov rdi, coordinatesR ; rdi => coordinatesR base address
+    
+    jmp _letter_cases_end
+
+_case_s:
+    cmp rdi, 115 ; current letter == 115 (s in ASCII) ?
+    jne _case_t ; current letter != 115 (s in ASCII) 
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesS
+        
+    mov rdi, coordinatesS ; rdi => coordinatesS base address
+    
+    jmp _letter_cases_end
+
+_case_t:
+    cmp rdi, 116 ; current letter == 116 (t 116 in ASCII) ?
+    jne _case_u ; current letter != 116 (t in ASCII) 
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesT
+        
+    mov rdi, coordinatesT ; rdi => coordinatesT base address
+    
+    jmp _letter_cases_end
+
+_case_u:
+    cmp rdi, 117 ; current letter == 117 (u in ASCII) ?
+    jne _case_v ; current letter != 117 (u in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesU
+        
+    mov rdi, coordinatesU ; rdi => coordinatesU base address
+    
+    jmp _letter_cases_end
+
+_case_v:
+    cmp rdi, 118 ; current letter == 118 (v in ASCII) ?
+    jne _case_w ; current letter != 118 (v in ASCII) 
+    
+    mov r8, 24 ; 12 coordinates or 24 elements in coordinatesV
+        
+    mov rdi, coordinatesV ; rdi => coordinatesV base address
+    
+    jmp _letter_cases_end
+
+_case_w:
+    cmp rdi, 119 ; current letter == 119 (w in ASCII) ?
+    jne _case_x ; current letter != 119 (w in ASCII) 
+    
+    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesW
+        
+    mov rdi, coordinatesW ; rdi => coordinatesW base address
+    
+    jmp _letter_cases_end
+
+_case_x:
+    cmp rdi, 120 ; current letter == 120 (x in ASCII) ?
+    jne _case_y ; current letter != 120 (x in ASCII) 
+    
+    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesX
+        
+    mov rdi, coordinatesX ; rdi => coordinatesX base address
+    
+    jmp _letter_cases_end
+
+_case_y:
+    cmp rdi, 121 ; current letter == 121 (y in ASCII) ?
+    jne _case_z ; current letter != 121 (y in ASCII) 
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesY
+        
+    mov rdi, coordinatesY ; rdi => coordinatesY base address
+    
+    jmp _letter_cases_end
+
+_case_z:
+    ; current letter = 122 (z in ASCII)
+    
+    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesZ
+        
+    mov rdi, coordinatesZ ; rdi => coordinatesZ base address    
+           
 _letter_cases_end:
     ret
                                                                                  
@@ -989,16 +1206,7 @@ _update_output_file:
                     
                       
                         
-                          
-                            
-                              
-     ;_open_output_text_file:
-;    mov     rcx, 0 ; rcx = 0
-;    mov     rbx, outputFileName ; rbx = filename address
-;    mov     rax, 5 ; rax = 5
-;    int     80h                           
-                                  
-                                 
+          
 
                                         
 
