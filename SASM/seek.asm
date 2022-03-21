@@ -15,7 +15,7 @@ CMAIN:
     int     80h                 ; call the kernel
  
     mov     edx, 0              ; whence argument (SEEK_END)
-    mov     ecx, 20              ; move the cursor 0 bytes
+    mov     ecx, 62499              ; move the cursor 0 bytes
     mov     ebx, eax            ; move the opened file descriptor into EBX
     mov     eax, 19             ; invoke SYS_LSEEK (kernel opcode 19)
     int     80h                 ; call the kernel
