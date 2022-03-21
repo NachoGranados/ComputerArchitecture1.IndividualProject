@@ -6,6 +6,8 @@ text resb 1682 ; variable to store file contents
 
 section .data
 
+
+
 n equ 250 ; number of columns
 
 pixel db '0'
@@ -49,7 +51,19 @@ coordinatesZ db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 4, 4
 
 coordinatesSignature db 0, 1, 4, 1, 0, 3, 4, 3, 1, 0, 1, 4, 3, 0, 3, 4
 
+;text db "LAS BALLENAS."
+
 line times 10 db 10
+
+
+
+
+
+
+
+
+
+
 
 section .text
 
@@ -90,7 +104,7 @@ _read_input_text_file:
     mov     rax, text ; rax = text address
    
     call    _print_string_2 
-    
+   
     mov     rbx, rbx ; rbx = rbx
     mov     rax, 6 ; rax = SYS_CLOSE
     int     80h ; call the kernel                    
@@ -99,9 +113,9 @@ _loops_variables:
     mov rax, 0 ; rax => letter pointer (text variable)
     mov rbx, 0 ; rbx => coordinates pointer (coordinates variable)
     mov rcx, 0 ; rcx => line pointer (line variable)
-    mov rdx, 0 ; rdx => i (matrix variable)
-    ;mov rsi, 4 ; rsi => j (matrix variable)   
-    mov rsi, 1000 ; rsi => j (matrix variable)   
+    mov rdx, 0 ; rdx => i (output file variable)
+    ;mov rsi, 4 ; rsi => j (output file variable)   
+    mov rsi, 1000 ; rsi => j (output file variable)   
     
 _letter_loop_start:  
     push rax ; preserve rax on the stack
@@ -116,6 +130,8 @@ _letter_loop_start:
         
     cmp rax, rdi ; letter pointer == len ?
     jne _pass_1 ; letter pointer != len
+    
+    ;call _check_word_overflow_start
     
     mov rdi, coordinatesSignature ; rdi = coordinatesSignature base address
     
@@ -135,8 +151,19 @@ _pass_1:
     movzx rdi, byte [rdi] ; rdi => current letter
     
     cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
-    jne _pass_2 ; current letter != 32 (" " in ASCII)
+    jne _pass_2 ; current letter != 32 (" " in ASCII)   
+        
+    ; AQUI SE QUE EL PROXIMO CARACTER SERA UNA LETRA
+    ; ENTONCES APARTIR DE letter pointer + 1 TENGO QUE
+    ; CONTAR HASTA ENCONTRAR EL SIGUIENTE ESPACIO
     
+    
+    ;call _check_word_overflow_start
+    
+    
+    
+    
+        
     jmp _coordinates_loop_end
     
 _pass_2:    
@@ -305,41 +332,57 @@ _coordinates_loop_end:
 
     mov rbx, 0 ; coordinates pointer = 0
 
-    add rax, 1 ; letter pointer + 1
+    ;add rax, 1 ; letter pointer + 1
 
     add rdx, 6 ; i + 6   
     
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
+    
+    
+    
+    mov rdi, text ; rdi => text base address
+    add rdi, rax ; rdi = text base address + letter pointer
+    
+    movzx rdi, byte [rdi] ; rdi => current letter
+    
+    cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
+    jne _continue ; current letter != 32 (" " in ASCII)
+    
+    call _check_word_overflow_start
+    
+    
+    
+    
+    ;push rax ; preserve rax on the stack
+    ;push rbx ; preserve rbx on the stack
     ;push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack
+    ;push rdx ; preserve rdx on the stack
     
     ;mov rax, 82 ; dividendo
     
     ; rax => dividend
     
-    mov rdx, 0 ; rdx => residue
+    ;mov rdx, 0 ; rdx => residue
     
-    mov rbx, 41 ; rbx => divider
+    ;mov rbx, 41 ; rbx => divider
     
-    div rbx ; rax = rax / rbx
+    ;div rbx ; rax = rax / rbx
     
-    mov r14, rdx ; r14 = rdx => residue
+    ;mov r14, rdx ; r14 = rdx => residue
     
-    pop rdx ; restore rdx from the stack
+    ;pop rdx ; restore rdx from the stack
     ;pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
+    ;pop rbx ; restore rbx from the stack
+    ;pop rax ; restore rax from the stack
     
-    cmp r14, 0 ; residue == 0 ?
-    jne _continue ; residue != 0
+    ;cmp r14, 0 ; residue == 0 ?
+    ;jne _continue ; residue != 0
     
-    mov rdx, 0 ; i = 0
-    add rsi, 1500 ; j + 1500
+    ;mov rdx, 0 ; i = 0
+    ;add rsi, 1500 ; j + 1500
             
 _continue:              
 
-    ;add rax, 1 ; letter pointer + 1
+    add rax, 1 ; letter pointer + 1
             
     jmp _letter_loop_start
 
@@ -420,8 +463,88 @@ _text_length_finished:
     pop rbx ; restore rbx from the stack 
     
     ret                                           
-                                                    
-                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+_check_word_overflow_start:     
+    mov r8, 1 ; r8 => word length => 1 considering the space after the word
+    
+    call _word_length_start
+    
+    add r8, rax ; r8 = word length + letter pointer => final length
+    
+_check_word_overflow_division:
+    push rax ; preserve rax on the stack
+    push rbx ; preserve rbx on the stack
+    push rcx ; preserve rcx on the stack
+    push rdx ; preserve rdx on the stack
+        
+    mov rax, rsi ; rax = j => dividend
+    
+    mov rdx, 0 ; rdx => residue
+    
+    mov rbx, 1500 ; rbx => divider
+    
+    div rbx ; rax = rax / rbx
+    
+    mov r9, rax ; r9 = rax => division result
+    
+    pop rdx ; restore rdx from the stack
+    pop rcx ; restore rcx from the stack
+    pop rbx ; restore rbx from the stack
+    pop rax ; restore rax from the stack
+    
+    imul r9, 41 ; r9 = division result * 41
+    
+    sub r8, r9 ; r8 = final length - (division result * 41) => overflow
+    
+    cmp r8, 41 ; overflow > 41 ?
+    jle _check_word_overflow_end ; overflow =< 41
+        
+    mov rdx, 0 ; i = 0
+    add rsi, 1500 ; j + 1500    
+            
+_check_word_overflow_end:
+    ret
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+          
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+; rax => letter pointer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+; r8 => word length                                                                                                   
+_word_length_start:
+    mov r9, rax ; r9 = letter pointer
+    add r9, 1 ; r9 = letter pointer + 1
+    
+_word_length_loop:    
+    mov r10, text; r10 => text base address
+    
+    add r10, r9 ; r10 = text base address + letter pointer
+    
+    movzx r10, byte [r10] ; r10 => current letter
+
+_word_length_if_1:
+    cmp r10, 4 ; current letter != 4 (End of Transmission in ASCII) ?
+    je _word_length_end ; current letter == 4 (End of Transmission in ASCII)
+                  
+_word_length_if_2:                        
+    cmp r10, 32 ; current letter != 32 (" " in ASCII) ?
+    je _word_length_end ; current letter == 32 (" " in ASCII)  
+    
+    add r8, 1 ; r8 = word length + 1
+    add r9, 1 ; r9 = letter pointer + 1     
+    
+    jmp _word_length_loop
+                                                                                                                          
+_word_length_end:
+    ret                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
                                                                         
 ; rdi => current letter
 ; r8 => letter flag                                                                                                                                                                                                                                                  
@@ -966,27 +1089,6 @@ _case_z:
            
 _letter_cases_end:
     ret
-                                                                                 
-                                                                                                                                                                  
-                                                                                                                                                                                                                                                   
-                                                                                                                                                                                                                                                                                                                                                                                                                     
-
-                                                                                            
-                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
-                                                                                                      
-                                                                                                                
-                                                                                                                          
-                                                                                                                                    
-                                                                                                                                              
-                                                                                                                                                        
-                                                                                                                                                                  
-                                                                                                                                                                            
                                                                                                                                                                                       
 ; rdi = x1
 ; rsi = y1
