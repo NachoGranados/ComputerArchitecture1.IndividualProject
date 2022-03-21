@@ -2,7 +2,7 @@
 
 section .bss
 
-text resb 1700 ; variable to store file contents
+text resb 1682 ; variable to store file contents
 
 section .data
 
@@ -46,6 +46,8 @@ coordinatesW db 0, 0, 1, 0, 3, 0, 4, 0, 0, 0, 0, 4, 4, 0, 4, 4, 1, 0, 2, 1
 coordinatesX db 0, 0, 4, 4, 0, 4, 4, 0
 coordinatesY db 2, 0, 2, 2, 0, 4, 2, 2, 2, 2, 4, 4
 coordinatesZ db 0, 0, 4, 0, 0, 4, 4, 4, 0, 0, 4, 4
+
+coordinatesSignature db 0, 1, 4, 1, 0, 3, 4, 3, 1, 0, 1, 4, 3, 0, 3, 4
 
 line times 10 db 10
 
@@ -111,14 +113,21 @@ _letter_loop_start:
     mov rdi, rax ; rdi => text lenght     
     
     pop rax ; restore rax from the stack
+        
+    cmp rax, rdi ; letter pointer == len ?
+    jne _pass_1 ; letter pointer != len
+    
+    mov rdi, coordinatesSignature ; rdi = coordinatesSignature base address
+    
+    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesSignature
+    
+    ; PARA LA FIRMA, CARGAR EN rdi LA VARIABLE coordinatesSignature Y EN r8 EL FLAG
+    
+    jmp _pass_3
 
+_pass_1:
     cmp rax, rdi ; letter pointer < len ?
-    jge _letter_loop_end ; letter pointer >= len
-    
-    
-    
-    
-    
+    jg _letter_loop_end ; letter pointer > len
     
     mov rdi, text ; rdi => text base address
     add rdi, rax ; rdi = text base address + letter pointer
@@ -126,36 +135,23 @@ _letter_loop_start:
     movzx rdi, byte [rdi] ; rdi => current letter
     
     cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
-    jne _pass ; current letter != 32 (" " in ASCII)
+    jne _pass_2 ; current letter != 32 (" " in ASCII)
     
     jmp _coordinates_loop_end
-      
     
-    
-_pass:    
+_pass_2:    
     mov r8, 0 ; r8 => letter flag
-    
-    
-    
-  
-    
-    
-    
-    
-    
-    
-    
-    
+        
     call _letter_cases_start
-    
-    
     
     ; CASES DE LAS LETRAS
     ; ASIGNAR EL FLAG DE CADA LETRA QUE ES LA CANTIDAD DE CORDENADAS QUE ESA LETRA TIENE
     
-    ; AL FINAL DE LOS CASES, rdi ALMACENARA LA DIRECCION DE MEMORIA DEL ARREGLO DE COORDENADAS DE LA RESPECTIVA LETRA
+    ; AL FINAL DE LOS CASES, rdi ALMACENARA LA DIRECCION DE MEMORIA DEL ARREGLO DE COORDENADAS DE LA RESPECTIVA LETRA      
     
+    ; PARA LA FIRMA, CARGAR EN rdi LA VARIABLE coordinatesSignature Y EN r8 EL FLAG
     
+_pass_3:    
     
     mov r9, 0 ; r9 => coordinates offset    
     
@@ -194,8 +190,7 @@ _store_on_stack:
     ;add r9, 8 ; ofset++
     movzx rcx, byte [rax + r9] ; cordinates[ofset] = y2
     inc r9
-    
-    
+        
     push r9 ; preserve r9 on the stack   
                
     ; LLAMAR AL ALGORITMO DE BRESENHAM
@@ -349,7 +344,7 @@ _continue:
     jmp _letter_loop_start
 
 _letter_loop_end:
-        
+     
 _exit:
     mov rbx, 0 ; rbx = 0
     mov rax, 1; rax = 1

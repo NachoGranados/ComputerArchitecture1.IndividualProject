@@ -7,6 +7,8 @@ section .data
 str1 db 'A'
 str2 db 'A'
 
+var1 db 0
+
 
 
 section .ascii
@@ -26,6 +28,12 @@ CMAIN:
     mov rbx, 41 ; divisor
     
     div ebx
+    
+    mov rax, [var1]
+    mov rbx, 100
+    mov rax, rbx
+    
+    mov rcx, var1
     
     
     
