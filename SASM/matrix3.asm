@@ -12,7 +12,7 @@ pixel db '0'
 
 matrix times 62500 db '`'
 
-text db 'LAS BALLENAS SON UNOS ENORMES ANIMALES QUE PUEDEN ALCANZAR LOS VEINTEHHHHHHHHHHHHHHHHHH METROS DE LARGO. A PESAR DE SU TAMANO, SE ALIMENTAN DE PLANCTON. EL PLANCTON ESTA FORMADO POR PEQUENOS ANIMALES QUE VIVEN EN LA SUPERFICIE DEL MAR. LO FORMAN MILLONES DE LARVAS QUE CUANDO SE HACEN GRANDES SE TRANSFORMAN EN CANGREJOS, GAMBAS, ETC. LA BALLENA, PARA COMERLOS, ABRE LA BOCA Y TRAGA UNA GRAN CANTIDAD DE AGUA. EL AGUA ES FILTRADA Y DEVUELTA AL MAR. EL PLANCTON QUEDA ATRAPADO EN UNA ESPECIE DE FILTRO Y LE SIRVE DE ALIMENTO. LUEGO VUELVE A TRAGAR OTRA GRAN CANTIDAD DE AGUA Y ASI MUCHAS VECES. DE ESTA FORMA, EL ANIMAL MAS GRANDE DE LA TIERRA, SE ALIMENTA DE UNOS ANIMALITOS TAN PEQUENOS, QUE ES DIFICIL VERLOS A SIMPLE VISTA.' ; variable to store file contents
+text db 'LAS BALLENAS SON UNOS ENORMES ANIMALES QUE PUEDEN ALCANZAR LOS VEINTE METROS DE LARGO. A PESAR DE SU TAMANO, SE ALIMENTAN DE PLANCTON. EL PLANCTON ESTA FORMADO POR PEQUENOS ANIMALES QUE VIVEN EN LA SUPERFICIE DEL MAR. LO FORMAN MILLONES DE LARVAS QUE CUANDO SE HACEN GRANDES SE TRANSFORMAN EN CANGREJOS, GAMBAS, ETC. LA BALLENA, PARA COMERLOS, ABRE LA BOCA Y TRAGA UNA GRAN CANTIDAD DE AGUA. EL AGUA ES FILTRADA Y DEVUELTA AL MAR. EL PLANCTON QUEDA ATRAPADO EN UNA ESPECIE DE FILTRO Y LE SIRVE DE ALIMENTO. LUEGO VUELVE A TRAGAR OTRA GRAN CANTIDAD DE AGUA Y ASI MUCHAS VECES. DE ESTA FORMA, EL ANIMAL MAS GRANDE DE LA TIERRA, SE ALIMENTA DE UNOS ANIMALITOS TAN PEQUENOS, QUE ES DIFICIL VERLOS A SIMPLE VISTA.' ; variable to store file contents
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
@@ -328,56 +328,7 @@ _line_loop_start:
    
     ;mov [r13 + r15], r14 ; matrix[i_new + j_new] = pixel 
     
-    
-    
-    
-    
-    
-    
-    
-    
-    ;call _update_output_file  
-    
-    ; r13 => numer of bytes move the cursor                                                                                                                                                                                                                                                                         
-_update_output_file:
-    mov     rcx, 1 ; rcx = write only access mode
-    mov     rbx, outputFileName ; rbx = outputFileName base address
-    mov     rax, 5 ; rax = SYS_OPEN
-    int     80h ; call the kernel
- 
-    mov     rdx, 0 ; rdx = SEEK_SET
-    mov     rcx, r13 ; rcx = r13 => move the cursor 0 bytes
-    mov     rbx, rax ; rbx = opened file descriptor
-    mov     rax, 19 ; rax = SYS_LSEEK
-    int     80h ; call the kernel
- 
-    mov     rdx, 1 ; rdx = number of bytes to write
-    mov     rcx, pixel ; rcx = string base address
-    mov     rbx, rbx ; rbx = opened file descriptor
-    mov     rax, 4 ; rax = SYS_WRITE
-    int     80h ; call the kernel
-    
-    ;ret   
-      
-       
-        
-         
-          
-           
-            
-             
-              
-               
-                
-                 
-                  
-                   
-                    
-                     
-                      
-                       
-                        
-                          
+    call _update_output_file         
     
     pop rdx ; restore rdx from the stack
     pop rcx ; restore rcx from the stack
@@ -1006,15 +957,16 @@ _bresenham_end:
                                                                                                                                                                                                                               
                                                                                                                                                                                                                                         
 
-; r13 => numer of bytes move the cursor                                                                                                                                                                                                                                                                         
-;_update_output_file:
+; r13 => number of bytes to move the cursor                                                                                                                                                                                                                                                                         
+_update_output_file:
     mov     rcx, 1 ; rcx = write only access mode
     mov     rbx, outputFileName ; rbx = outputFileName base address
     mov     rax, 5 ; rax = SYS_OPEN
     int     80h ; call the kernel
  
     mov     rdx, 0 ; rdx = SEEK_SET
-    mov     rcx, r13 ; rcx = r13 => move the cursor 0 bytes
+    mov     rcx, r13 ; rcx = r13 => number of bytes to move the cursor 
+    ;mov     rcx, 5000 ; rcx = r13 => number of bytes to move the cursor 
     mov     rbx, rax ; rbx = opened file descriptor
     mov     rax, 19 ; rax = SYS_LSEEK
     int     80h ; call the kernel
@@ -1023,6 +975,10 @@ _bresenham_end:
     mov     rcx, pixel ; rcx = string base address
     mov     rbx, rbx ; rbx = opened file descriptor
     mov     rax, 4 ; rax = SYS_WRITE
+    int     80h ; call the kernel
+    
+    mov     rbx, rbx ; rbx = rbx
+    mov     rax, 6 ; rax = SYS_CLOSE
     int     80h ; call the kernel
     
     ret                                                                                                                                                                                                                                                                                  
