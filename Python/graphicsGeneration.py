@@ -33,7 +33,7 @@ for line in file:
 
 newMatrix = np.array(matrix, dtype=np.uint8)
 
-print(newMatrix)
+#print(newMatrix)
 
 newMatrix = np.transpose(newMatrix)
 

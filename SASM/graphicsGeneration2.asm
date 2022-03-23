@@ -269,27 +269,19 @@ _continue:
 
 _letter_loop_end:
 
-
-
-
-
-
-
-
 _signature:
     mov rbx, 0 ; coordinates pointer = 0
 
-    mov rdi, coordinatesSignature ; rdi = coordinatesSignature base address
+    mov r8, coordinatesSignature ; rdi = coordinatesSignature base address
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesSignature
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesSignature
     
-    mov r9, 0 ; r9 => coordinates offset
+    mov r10, 0 ; r10 => coordinates offset
 
 _signature_coordinates_loop_start:
-    cmp rbx, r8 ; coordinates pointer < letter flag ?
+    cmp rbx, r9 ; coordinates pointer < letter flag ?
     jge _signature_coordinates_loop_end ; coordinates pointer >= letter flag
-              
-_signature_store_on_stack:    
+                 
     push rax ; preserve rax on the stack
     push rbx ; preserve rbx on the stack
     push rcx ; preserve rcx on the stack
@@ -297,26 +289,31 @@ _signature_store_on_stack:
     push rsi ; preserve rsi on the stack
     push rdi ; preserve rdi on the stack
     push r8 ; preserve r8 on the stack
+    push r9 ; preserve r9 on the stack
     
-    mov rax, rdi ; rax => coordinates base address
-      
-    movzx rdi, byte [rax + r9] ; cordinates[ofset] = x1
-    inc r9
-      
-    movzx rsi, byte [rax + r9] ; cordinates[ofset] = y1
-    inc r9
-              
-    movzx rdx, byte [rax + r9] ; cordinates[ofset] = x2
-    inc r9
+    mov rax, r8 ; rax => coordinatesLetter base address
     
-    movzx rcx, byte [rax + r9] ; cordinates[ofset] = y2
-    inc r9
+    movzx rdi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x1
+    inc r10 ; coordinates offset + 1
+    
+    movzx rsi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y1
+    inc r10 ; coordinates offset + 1
         
-    push r9 ; preserve r9 on the stack   
-
+    movzx rdx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x2
+    inc r10 ; coordinates offset + 1
+    
+    movzx rcx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y2
+    inc r10 ; coordinates offset + 1
+        
+    push r10 ; preserve r10 on the stack   
+                   
     call _bresenham
-        
-_signature_restore_from_stack:       
+    
+    ; r10 => number of coordinates of current line
+    
+    mov r11, r10 ; r11 = number of coordinates of current line
+      
+    pop r10 ; restore r10 from the stack
     pop r9 ; restore r9 from the stack
     pop r8 ; restore r8 from the stack
     pop rdi ; restore rdi from the stack
@@ -326,26 +323,26 @@ _signature_restore_from_stack:
     pop rbx ; restore rbx from the stack
     pop rax ; restore rax from the stack
     
-    mov r11, line ; r11 => line base address    
+    mov r12, line ; r12 => line base address    
     
 _signature_line_loop_start:
-    cmp rcx, r10 ; line pointer < number of coordinates of current line ?
+    cmp rcx, r11 ; line pointer < number of coordinates of current line ?
     jge _signature_line_loop_end ; line pointer >= number of coordinates of current line
     
-    mov r12, rcx ; r12 => line pointer
+    mov r13, rcx ; r13 => line pointer
     
-    movzx r13, byte [r11 + r12] ; r13 = line[line pointer] => x
+    movzx r14, byte [r12 + r13] ; r14 = line[line pointer] => x
     
-    inc r12 ; line pointer ++
+    inc r13 ; line pointer + 1
     
-    movzx r14, byte [r11 + r12] ; r14 = line[line pointer] => y
+    movzx r15, byte [r12 + r13] ; r15 = line[line pointer] => y
     
     push rdx ; preserve rsi on the stack
     push rsi ; preserve rdi on the stack
     
-    add rdx, r13 ; rdx = x + i => i_new
+    add rdx, r14 ; rdx = i + x => i_new
     
-    mov r15, n ; r15 = n
+    mov r14, n ; r14 = n
     imul r14, r15 ; r14 = n * y
     sub rsi, r14 ; rsi = j - (n * y) => j_new
     
@@ -354,8 +351,8 @@ _signature_line_loop_start:
     mov r13, rdx ; r13 = i_new + j_new
     
     pop rsi ; restore rdi from the stack
-    pop rdx ; restore rsi from the stack   
-    
+    pop rdx ; restore rsi from the stack 
+        
     push rax ; preserve rax on the stack
     push rbx ; preserve rbx on the stack
     push rcx ; preserve rcx on the stack
