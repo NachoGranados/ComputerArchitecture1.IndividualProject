@@ -2,7 +2,7 @@
 
 section .bss
 
-;text resb 1764 ; variable to store file contents
+text resb 1764 ; variable to store file contents
 
 section .data
 
@@ -14,8 +14,6 @@ matrix times 63504 db '1'
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
-
-text db 'otro un concierto asnal con altos y bajos, con mis y con fas. Y el otro le dice en tono formal, digas lo que digas, y esta es la verdad, por mucho teatro que le quieras dar, a mi me parece que eso es rebuznar. '
 
 coordinatesComma db 2, 0, 3, 1
 coordinatesPoint db 1, 0, 2, 0, 1, 1, 2, 1
@@ -51,8 +49,6 @@ coordinatesSignature db 0, 1, 4, 1, 0, 3, 4, 3, 1, 0, 1, 4, 3, 0, 3, 4
 
 line times 10 db 10
 
-
-
 section .text
 
 global CMAIN
@@ -78,31 +74,32 @@ _write_output_text_file:
     int     80h ; call the kernel     
     
 _read_input_text_file: 
-    ;mov     rcx, 0 ; rcx = 0
-    ;mov     rbx, inputFileName ; rcx = inputFileName address
-    ;mov     rax, 5 ; rax = 5
-    ;int     80h ; call the kernel
+    mov     rcx, 0 ; rcx = 0
+    mov     rbx, inputFileName ; rcx = inputFileName address
+    mov     rax, 5 ; rax = 5
+    int     80h ; call the kernel
 
-    ;mov     rdx, 1764 ; rdx => number of bytes to read
-    ;mov     rcx, text ; rcx = inputFileName address
-    ;mov     rbx, rax ; rbx = rax
-    ;mov     rax, 3 ; rax = 3
-    ;int     80h ; call the kernel
+    mov     rdx, 1764 ; rdx => number of bytes to read
+    mov     rcx, text ; rcx = inputFileName address
+    mov     rbx, rax ; rbx = rax
+    mov     rax, 3 ; rax = 3
+    int     80h ; call the kernel
  
-    ;mov     rax, text ; rax = text address
+    mov     rax, text ; rax = text address
    
-    ;call    _print_string_2 
+    call    _print_string_2 
    
-    ;mov     rbx, rbx ; rbx = rbx
-    ;mov     rax, 6 ; rax = SYS_CLOSE
-    ;int     80h ; call the kernel                    
+    mov     rbx, rbx ; rbx = rbx
+    mov     rax, 6 ; rax = SYS_CLOSE
+    int     80h ; call the kernel                    
           
 _loops_variables:      
     mov rax, 0 ; rax => letter pointer (text variable)
     mov rbx, 0 ; rbx => coordinates pointer (coordinates variable)
     mov rcx, 0 ; rcx => line pointer (line variable)
     mov rdx, 0 ; rdx => i (output file variable)  
-    mov rsi, 1008 ; rsi => j (output file variable)   
+    mov rsi, 1008 ; rsi => j (output file variable)
+    mov rdi, 0 ; rdi => letter counter by line
     
 _letter_loop_start:  
     push rax ; preserve rax on the stack
@@ -113,52 +110,44 @@ _letter_loop_start:
     
     mov r8, rax ; r8 => text lenght     
     
-    pop rax ; restore rax from the stack
-    
-    mov rdi, text ; rdi => text base address
-    add rdi, rax ; rdi = text base address + letter pointer
-    
-    movzx rdi, byte [rdi] ; rdi => current letter
-    
-    cmp rax, r8 ; letter pointer >= len ?
-    jl _pass_0 ; letter pointer < len
+    pop rax ; restore rax from the stack      
+
+_letter_loop_break_condition_1:     
+    cmp rax, r8 ; letter pointer >= text lenght ?
+    jl _letter_loop_break_condition_2 ; letter pointer < text lenght
     
     jmp _letter_loop_end
 
-_pass_0:                     
-    cmp rdi, 32 ; current letter < 32 (" " in ASCII) ?
+_letter_loop_break_condition_2:      
+    mov r8, text ; r8 => text base address
+    add r8, rax ; r8 = text base address + letter pointer
+    
+    movzx r8, byte [r8] ; rdi => current letter
+                            
+    cmp r8, 32 ; current letter < 32 (" " in ASCII) ?
     jge _pass_1 ; current letter >= 32 (" " in ASCII)   
     
     jmp _letter_loop_end
     
-_pass_1:
-    cmp rax, r8 ; letter pointer < len ?
-    jge _letter_loop_end ; letter pointer > len
-    
-    ;mov rdi, text ; rdi => text base address
-    ;add rdi, rax ; rdi = text base address + letter pointer
-    
-    ;movzx rdi, byte [rdi] ; rdi => current letter
-    
-    cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
+_pass_1:    
+    cmp r8, 32 ; current letter == 32 (" " in ASCII) ?
     jne _pass_2 ; current letter != 32 (" " in ASCII)   
                 
     jmp _coordinates_loop_end
     
-_pass_2:    
-    mov r8, 0 ; r8 => letter flag
-        
+_pass_2:            
     call _letter_cases_start
     
-_pass_3:    
+    ; r8 => coordinatesLetter base address
     
-    mov r9, 0 ; r9 => coordinates offset    
+    ; r9 => letter flag
+        
+    mov r10, 0 ; r10 => coordinates offset    
     
 _coordinates_loop_start:
-    cmp rbx, r8 ; coordinates pointer < letter flag ?
+    cmp rbx, r9 ; coordinates pointer < letter flag ?
     jge _coordinates_loop_end ; coordinates pointer >= letter flag
-              
-_store_on_stack:    
+                 
     push rax ; preserve rax on the stack
     push rbx ; preserve rbx on the stack
     push rcx ; preserve rcx on the stack
@@ -166,26 +155,31 @@ _store_on_stack:
     push rsi ; preserve rsi on the stack
     push rdi ; preserve rdi on the stack
     push r8 ; preserve r8 on the stack
+    push r9 ; preserve r9 on the stack
     
-    mov rax, rdi ; rax => coordinates base address
+    mov rax, r8 ; rax => coordinatesLetter base address
     
-    movzx rdi, byte [rax + r9] ; cordinates[ofset] = x1
-    inc r9
+    movzx rdi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x1
+    inc r10 ; coordinates offset + 1
     
-    movzx rsi, byte [rax + r9] ; cordinates[ofset] = y1
-    inc r9
+    movzx rsi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y1
+    inc r10 ; coordinates offset + 1
         
-    movzx rdx, byte [rax + r9] ; cordinates[ofset] = x2
-    inc r9
+    movzx rdx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x2
+    inc r10 ; coordinates offset + 1
     
-    movzx rcx, byte [rax + r9] ; cordinates[ofset] = y2
-    inc r9
+    movzx rcx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y2
+    inc r10 ; coordinates offset + 1
         
-    push r9 ; preserve r9 on the stack   
+    push r10 ; preserve r10 on the stack   
                    
     call _bresenham
-        
-_restore_from_stack:       
+    
+    ; r10 => number of coordinates of current line
+    
+    mov r11, r10 ; r11 = number of coordinates of current line
+      
+    pop r10 ; restore r10 from the stack
     pop r9 ; restore r9 from the stack
     pop r8 ; restore r8 from the stack
     pop rdi ; restore rdi from the stack
@@ -195,26 +189,26 @@ _restore_from_stack:
     pop rbx ; restore rbx from the stack
     pop rax ; restore rax from the stack
     
-    mov r11, line ; r11 => line base address    
+    mov r12, line ; r12 => line base address    
     
 _line_loop_start:
-    cmp rcx, r10 ; line pointer < number of coordinates of current line ?
+    cmp rcx, r11 ; line pointer < number of coordinates of current line ?
     jge _line_loop_end ; line pointer >= number of coordinates of current line
     
-    mov r12, rcx ; r12 => line pointer
+    mov r13, rcx ; r13 => line pointer
     
-    movzx r13, byte [r11 + r12] ; r13 = line[line pointer] => x
+    movzx r14, byte [r12 + r13] ; r14 = line[line pointer] => x
     
-    inc r12 ; line pointer ++
+    inc r13 ; line pointer + 1
     
-    movzx r14, byte [r11 + r12] ; r14 = line[line pointer] => y
+    movzx r15, byte [r12 + r13] ; r15 = line[line pointer] => y
     
     push rdx ; preserve rsi on the stack
     push rsi ; preserve rdi on the stack
     
-    add rdx, r13 ; rdx = x + i => i_new
+    add rdx, r14 ; rdx = i + x => i_new
     
-    mov r15, n ; r15 = n
+    mov r14, n ; r14 = n
     imul r14, r15 ; r14 = n * y
     sub rsi, r14 ; rsi = j - (n * y) => j_new
     
@@ -254,15 +248,13 @@ _coordinates_loop_end:
     mov rbx, 0 ; coordinates pointer = 0
 
     add rdx, 6 ; i + 6
+        
+    mov r8, text ; r8 => text base address
+    add r8, rax ; r8 = text base address + letter pointer
     
-    ;add rax, 1 ; letter pointer + 1   
+    movzx r8, byte [r8] ; rdi => current letter
     
-    ;mov rdi, text ; rdi => text base address
-    ;add rdi, rax ; rdi = text base address + letter pointer
-    
-    ;movzx rdi, byte [rdi] ; rdi => current letter
-    
-    cmp rdi, 32 ; current letter == 32 (" " in ASCII) ?
+    cmp r8, 32 ; current letter == 32 (" " in ASCII) ?
     jne _continue ; current letter != 32 (" " in ASCII)
     
     call _check_word_overflow_start
@@ -270,10 +262,19 @@ _coordinates_loop_end:
 _continue:              
 
     add rax, 1 ; letter pointer + 1
+    
+    add rdi, 1 ; letter counter by line + 1
             
     jmp _letter_loop_start
 
 _letter_loop_end:
+
+
+
+
+
+
+
 
 _signature:
     mov rbx, 0 ; coordinates pointer = 0
@@ -453,68 +454,37 @@ _text_length_finished:
     
     ret  
     
-; **************************************                                                                                       
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-_check_word_overflow_start:     
-    ;mov r8, 1 ; r8 => word length => 1 considering the space after the word
-    ;mov r8, 0 ; r8 => word length
-    
-    call _word_length_start
-    
-    ;add r8, rax ; r8 = word length + letter pointer => final length ************************************************
-    
-    mov r8, r9 ; r8 = final length <=================
-    
-_check_word_overflow_division:
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
-    push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack
-        
-    mov rax, rsi ; rax = j => dividend
-    
-    mov rdx, 0 ; rdx => residue
-    
-    mov rbx, 1512 ; rbx => divider
-    
-    div rbx ; rax = rax / rbx
-    
-    mov r9, rax ; r9 = rax => division result
-    
-    pop rdx ; restore rdx from the stack
-    pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
-    
-    ;imul r9, 42 ; r9 = division result * 42
-    
-    imul r9, 41 ; r9 = division result * 41
-    
-    ;sub r8, r9 ; r8 = final length - (division result * 42) => overflow
+; **************************************
 
-    sub r8, r9 ; r8 = final length - (division result * 41) => overflow
-            
-    ;add r8, 1 ; r8 = final length + 1
+; rdi => letter counter by line                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+_check_word_overflow_start:
     
-    ;sub r8, 1 ; r8 = final length - 1
+    call _word_length_start   
+       
+    ; r8 = word length
     
-    cmp r8, 41 ; overflow > 41 ? 
+_check_word_overflow_division:    
+    mov r9, rdi ; r9 = letter counter by line
+    
+    add r9, r8 ; r9 = letter counter by line + word length => overflow
+    
+    cmp r9, 41 ; overflow > 41 ? 
     jle _check_word_overflow_end ; overflow =< 41
-    
-    ;cmp r8, 42 ; overflow > 42 ?
-    ;jle _check_word_overflow_end ; overflow <= 42
-        
+            
     mov rdx, 0 ; i = 0
-    add rsi, 1512 ; j + 1512   
+    add rsi, 1512 ; j + 1512
+    
+    mov rdi, 0 ; letter counter by line = 0
             
 _check_word_overflow_end:
     ret
 
 ; ************************************** 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-; rax => letter pointer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
-; r8 => word length                                                                                                   
+; rax => letter pointer                                                                                                   
 _word_length_start:
+    mov r8, 0 ; r8 => word length   
+
     mov r9, rax ; r9 = letter pointer
     add r9, 1 ; r9 = letter pointer + 1
     
@@ -528,7 +498,7 @@ _word_length_loop:
     cmp r10, 32 ; current letter > 32 (" " in ASCII) ?
     jle _word_length_end ; current letter <= 32 (" " in ASCII)                
               
-    ;add r8, 1 ; r8 = word length + 1
+    add r8, 1 ; r8 = word length + 1
     add r9, 1 ; r9 = letter pointer + 1     
     
     jmp _word_length_loop
@@ -538,546 +508,546 @@ _word_length_end:
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 ; **************************************                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
                                                                         
-; rdi => current letter
-; r8 => letter flag                                                                                                                                                                                                                                                  
+; r8 => current letter
+; r9 => letter flag                                                                                                                                                                                                                                                  
 _letter_cases_start:
 
 _case_comma:
-    cmp rdi, 44 ; current letter == 44 (, in ASCII) ?
+    cmp r8, 44 ; current letter == 44 (, in ASCII) ?
     jne _case_point ; current letter != 44 (, in ASCII)
     
-    mov r8, 4 ; 2 coordinates or 4 elements in coordinatesComma
+    mov r9, 4 ; 2 coordinates or 4 elements in coordinatesComma
         
-    mov rdi, coordinatesComma ; rdi => coordinatesComma base address
+    mov r8, coordinatesComma ; r8 => coordinatesComma base address
     
     jmp _letter_cases_end
 
 _case_point:
-    cmp rdi, 46 ; current letter == 46 (. in ASCII) ?
+    cmp r8, 46 ; current letter == 46 (. in ASCII) ?
     jne _case_A ; current letter != 46 (. in ASCII)
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesPoint
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesPoint
         
-    mov rdi, coordinatesPoint ; rdi => coordinatesPoint base address
+    mov r8, coordinatesPoint ; r8 => coordinatesPoint base address
     
     jmp _letter_cases_end
 
 _case_A:
-    cmp rdi, 65 ; current letter == 65 (A in ASCII) ?
+    cmp r8, 65 ; current letter == 65 (A in ASCII) ?
     jne _case_B ; current letter != 65 (A in ASCII)
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesA
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesA
         
-    mov rdi, coordinatesA ; rdi => coordinatesA base address
+    mov r8, coordinatesA ; r8 => coordinatesA base address
     
     jmp _letter_cases_end
 
 _case_B:
-    cmp rdi, 66 ; current letter == 66 (B in ASCII) ?
+    cmp r8, 66 ; current letter == 66 (B in ASCII) ?
     jne _case_C ; current letter != 66 (B in ASCII)
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesB
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesB
         
-    mov rdi, coordinatesB ; rdi => coordinatesB base address
+    mov r8, coordinatesB ; r8 => coordinatesB base address
     
     jmp _letter_cases_end
     
 _case_C:
-    cmp rdi, 67 ; current letter == 67 (C in ASCII) ?
+    cmp r8, 67 ; current letter == 67 (C in ASCII) ?
     jne _case_D ; current letter != 67 (C in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesC
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesC
         
-    mov rdi, coordinatesC ; rdi => coordinatesC base address
+    mov r8, coordinatesC ; r8 => coordinatesC base address
     
     jmp _letter_cases_end
 
 _case_D:
-    cmp rdi, 68 ; current letter == 68 (D in ASCII) ?
+    cmp r8, 68 ; current letter == 68 (D in ASCII) ?
     jne _case_E ; current letter != 68 (D in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesD
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesD
         
-    mov rdi, coordinatesD ; rdi => coordinatesD base address
+    mov r8, coordinatesD ; r8 => coordinatesD base address
     
     jmp _letter_cases_end
 
 _case_E:
-    cmp rdi, 69 ; current letter == 69 (E in ASCII) ?
+    cmp r8, 69 ; current letter == 69 (E in ASCII) ?
     jne _case_F ; current letter != 69 (E in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesE
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesE
         
-    mov rdi, coordinatesE ; rdi => coordinatesE base address
+    mov r8, coordinatesE ; r8 => coordinatesE base address
     
     jmp _letter_cases_end
 
 _case_F:
-    cmp rdi, 70 ; current letter == 70 (F in ASCII) ?
+    cmp r8, 70 ; current letter == 70 (F in ASCII) ?
     jne _case_G ; current letter != 70 (F in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesF
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesF
         
-    mov rdi, coordinatesF ; rdi => coordinatesF base address
+    mov r8, coordinatesF ; r8 => coordinatesF base address
     
     jmp _letter_cases_end
 
 _case_G:
-    cmp rdi, 71 ; current letter == 71 (G in ASCII) ?
+    cmp r8, 71 ; current letter == 71 (G in ASCII) ?
     jne _case_H ; current letter != 71 (G in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesG
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesG
         
-    mov rdi, coordinatesG ; rdi => coordinatesG base address
+    mov r8, coordinatesG ; r8 => coordinatesG base address
     
     jmp _letter_cases_end
 
 _case_H:
-    cmp rdi, 72 ; current letter == 72 (H in ASCII) ?
+    cmp r8, 72 ; current letter == 72 (H in ASCII) ?
     jne _case_I ; current letter != 72 (H in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesH
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesH
         
-    mov rdi, coordinatesH ; rdi => coordinatesH base address
+    mov r8, coordinatesH ; r8 => coordinatesH base address
     
     jmp _letter_cases_end
 
 _case_I:
-    cmp rdi, 73 ; current letter == 73 (I in ASCII) ?
+    cmp r8, 73 ; current letter == 73 (I in ASCII) ?
     jne _case_J ; current letter != 73 (I in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesI
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesI
         
-    mov rdi, coordinatesI ; rdi => coordinatesI base address
+    mov r8, coordinatesI ; r8 => coordinatesI base address
     
     jmp _letter_cases_end
 
 _case_J:
-    cmp rdi, 74 ; current letter == 74 (J in ASCII) ?
+    cmp r8, 74 ; current letter == 74 (J in ASCII) ?
     jne _case_K ; current letter != 74 (J in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesJ
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesJ
         
-    mov rdi, coordinatesJ ; rdi => coordinatesJ base address
+    mov r8, coordinatesJ ; r8 => coordinatesJ base address
     
     jmp _letter_cases_end
 
 _case_K:
-    cmp rdi, 75 ; current letter == 75 (K in ASCII) ?
+    cmp r8, 75 ; current letter == 75 (K in ASCII) ?
     jne _case_L ; current letter != 75 (K in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesK
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesK
         
-    mov rdi, coordinatesK ; rdi => coordinatesK base address
+    mov r8, coordinatesK ; r8 => coordinatesK base address
     
     jmp _letter_cases_end
 
 _case_L:
-    cmp rdi, 76 ; current letter == 76 (L in ASCII) ?
+    cmp r8, 76 ; current letter == 76 (L in ASCII) ?
     jne _case_M ; current letter != 76 (L in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesL
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesL
         
-    mov rdi, coordinatesL ; rdi => coordinatesL base address
+    mov r8, coordinatesL ; r8 => coordinatesL base address
     
     jmp _letter_cases_end
 
 _case_M:
-    cmp rdi, 77 ; current letter == 77 (M in ASCII) ?
+    cmp r8, 77 ; current letter == 77 (M in ASCII) ?
     jne _case_N ; current letter != 77 (M in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesM
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesM
         
-    mov rdi, coordinatesM ; rdi => coordinatesM base address
+    mov r8, coordinatesM ; r8 => coordinatesM base address
     
     jmp _letter_cases_end
 
 _case_N:
-    cmp rdi, 78 ; current letter == 78 (N in ASCII) ?
+    cmp r8, 78 ; current letter == 78 (N in ASCII) ?
     jne _case_O ; current letter != 78 (N in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesN
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesN
         
-    mov rdi, coordinatesN ; rdi => coordinatesN base address
+    mov r8, coordinatesN ; r8 => coordinatesN base address
     
     jmp _letter_cases_end
 
 _case_O:
-    cmp rdi, 79 ; current letter == 79 (O in ASCII) ?
+    cmp r8, 79 ; current letter == 79 (O in ASCII) ?
     jne _case_P ; current letter != 79 (O in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesO
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesO
         
-    mov rdi, coordinatesO ; rdi => coordinatesO base address
+    mov r8, coordinatesO ; r8 => coordinatesO base address
     
     jmp _letter_cases_end
 
 _case_P:
-    cmp rdi, 80 ; current letter == 80 (P in ASCII) ?
+    cmp r8, 80 ; current letter == 80 (P in ASCII) ?
     jne _case_Q ; current letter != 80 (P in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesP
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesP
         
-    mov rdi, coordinatesP ; rdi => coordinatesP base address
+    mov r8, coordinatesP ; r8 => coordinatesP base address
     
     jmp _letter_cases_end
 
 _case_Q:
-    cmp rdi, 81 ; current letter == 81 (Q in ASCII) ?
+    cmp r8, 81 ; current letter == 81 (Q in ASCII) ?
     jne _case_R ; current letter != 81 (Q in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesQ
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesQ
         
-    mov rdi, coordinatesQ ; rdi => coordinatesQ base address
+    mov r8, coordinatesQ ; r8 => coordinatesQ base address
     
     jmp _letter_cases_end
 
 _case_R:
-    cmp rdi, 82 ; current letter == 82 (R in ASCII) ?
+    cmp r8, 82 ; current letter == 82 (R in ASCII) ?
     jne _case_S ; current letter != 82 (R in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesR
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesR
         
-    mov rdi, coordinatesR ; rdi => coordinatesR base address
+    mov r8, coordinatesR ; r8 => coordinatesR base address
     
     jmp _letter_cases_end
 
 _case_S:
-    cmp rdi, 83 ; current letter == 83 (S in ASCII) ?
+    cmp r8, 83 ; current letter == 83 (S in ASCII) ?
     jne _case_T ; current letter != 83 (S in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesS
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesS
         
-    mov rdi, coordinatesS ; rdi => coordinatesS base address
+    mov r8, coordinatesS ; r8 => coordinatesS base address
     
     jmp _letter_cases_end
 
 _case_T:
-    cmp rdi, 84 ; current letter == 84 (T in ASCII) ?
+    cmp r8, 84 ; current letter == 84 (T in ASCII) ?
     jne _case_U ; current letter != 84 (T in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesT
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesT
         
-    mov rdi, coordinatesT ; rdi => coordinatesT base address
+    mov r8, coordinatesT ; r8 => coordinatesT base address
     
     jmp _letter_cases_end
 
 _case_U:
-    cmp rdi, 85 ; current letter == 85 (U in ASCII) ?
+    cmp r8, 85 ; current letter == 85 (U in ASCII) ?
     jne _case_V ; current letter != 85 (U in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesU
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesU
         
-    mov rdi, coordinatesU ; rdi => coordinatesU base address
+    mov r8, coordinatesU ; r8 => coordinatesU base address
     
     jmp _letter_cases_end
 
 _case_V:
-    cmp rdi, 86 ; current letter == 86 (V in ASCII) ?
+    cmp r8, 86 ; current letter == 86 (V in ASCII) ?
     jne _case_W ; current letter != 86 (V in ASCII) 
     
-    mov r8, 24 ; 12 coordinates or 24 elements in coordinatesV
+    mov r9, 24 ; 12 coordinates or 24 elements in coordinatesV
         
-    mov rdi, coordinatesV ; rdi => coordinatesV base address
+    mov r8, coordinatesV ; r8 => coordinatesV base address
     
     jmp _letter_cases_end
 
 _case_W:
-    cmp rdi, 87 ; current letter == 87 (W in ASCII) ?
+    cmp r8, 87 ; current letter == 87 (W in ASCII) ?
     jne _case_X ; current letter != 87 (W in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesW
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesW
         
-    mov rdi, coordinatesW ; rdi => coordinatesW base address
+    mov r8, coordinatesW ; r8 => coordinatesW base address
     
     jmp _letter_cases_end
 
 _case_X:
-    cmp rdi, 88 ; current letter == 88 (X in ASCII) ?
+    cmp r8, 88 ; current letter == 88 (X in ASCII) ?
     jne _case_Y ; current letter != 88 (X in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesX
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesX
         
-    mov rdi, coordinatesX ; rdi => coordinatesX base address
+    mov r8, coordinatesX ; r8 => coordinatesX base address
     
     jmp _letter_cases_end
 
 _case_Y:
-    cmp rdi, 89 ; current letter == 89 (Y in ASCII) ?
+    cmp r8, 89 ; current letter == 89 (Y in ASCII) ?
     jne _case_Z ; current letter != 89 (Y in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesY
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesY
         
-    mov rdi, coordinatesY ; rdi => coordinatesY base address
+    mov r8, coordinatesY ; r8 => coordinatesY base address
     
     jmp _letter_cases_end
 
 _case_Z:
-    cmp rdi, 90 ; current letter == 90 (Z in ASCII) ?
+    cmp r8, 90 ; current letter == 90 (Z in ASCII) ?
     jne _case_a ; current letter != 90 (Z in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesZ
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesZ
         
-    mov rdi, coordinatesZ ; rdi => coordinatesZ base address
+    mov r8, coordinatesZ ; r8 => coordinatesZ base address
     
     jmp _letter_cases_end    
     
 _case_a:
-    cmp rdi, 97 ; current letter == 97 (a in ASCII) ?
+    cmp r8, 97 ; current letter == 97 (a in ASCII) ?
     jne _case_b ; current letter != 97 (a in ASCII)
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesA
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesA
         
-    mov rdi, coordinatesA ; rdi => coordinatesA base address
+    mov r8, coordinatesA ; r8 => coordinatesA base address
     
     jmp _letter_cases_end
 
 _case_b:
-    cmp rdi, 98 ; current letter == 98 (b in ASCII) ?
+    cmp r8, 98 ; current letter == 98 (b in ASCII) ?
     jne _case_c ; current letter != 98 (b in ASCII)
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesB
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesB
         
-    mov rdi, coordinatesB ; rdi => coordinatesB base address
+    mov r8, coordinatesB ; r8 => coordinatesB base address
     
     jmp _letter_cases_end
     
 _case_c:
-    cmp rdi, 99 ; current letter == 99 (c in ASCII) ?
+    cmp r8, 99 ; current letter == 99 (c in ASCII) ?
     jne _case_d ; current letter != 99 (c in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesC
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesC
         
-    mov rdi, coordinatesC ; rdi => coordinatesC base address
+    mov r8, coordinatesC ; r8 => coordinatesC base address
     
     jmp _letter_cases_end
 
 _case_d:
-    cmp rdi, 100 ; current letter == 100 (d in ASCII) ?
+    cmp r8, 100 ; current letter == 100 (d in ASCII) ?
     jne _case_e ; current letter != 100 (d in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesD
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesD
         
-    mov rdi, coordinatesD ; rdi => coordinatesD base address
+    mov r8, coordinatesD ; r8 => coordinatesD base address
     
     jmp _letter_cases_end
 
 _case_e:
-    cmp rdi, 101 ; current letter == 101 (e in ASCII) ?
+    cmp r8, 101 ; current letter == 101 (e in ASCII) ?
     jne _case_f ; current letter != 101 (e in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesE
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesE
         
-    mov rdi, coordinatesE ; rdi => coordinatesE base address
+    mov r8, coordinatesE ; r8 => coordinatesE base address
     
     jmp _letter_cases_end
 
 _case_f:
-    cmp rdi, 102 ; current letter == 102 (f in ASCII) ?
+    cmp r8, 102 ; current letter == 102 (f in ASCII) ?
     jne _case_g ; current letter != 102 (f in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesF
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesF
         
-    mov rdi, coordinatesF ; rdi => coordinatesF base address
+    mov r8, coordinatesF ; r8 => coordinatesF base address
     
     jmp _letter_cases_end
 
 _case_g:
-    cmp rdi, 103 ; current letter == 103 (g in ASCII) ?
+    cmp r8, 103 ; current letter == 103 (g in ASCII) ?
     jne _case_h ; current letter != 103 (g in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesG
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesG
         
-    mov rdi, coordinatesG ; rdi => coordinatesG base address
+    mov r8, coordinatesG ; r8 => coordinatesG base address
     
     jmp _letter_cases_end
 
 _case_h:
-    cmp rdi, 104 ; current letter == 104 (h in ASCII) ?
+    cmp r8, 104 ; current letter == 104 (h in ASCII) ?
     jne _case_i ; current letter != 104 (h in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesH
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesH
         
-    mov rdi, coordinatesH ; rdi => coordinatesH base address
+    mov r8, coordinatesH ; r8 => coordinatesH base address
     
     jmp _letter_cases_end
 
 _case_i:
-    cmp rdi, 105 ; current letter == 105 (i in ASCII) ?
+    cmp r8, 105 ; current letter == 105 (i in ASCII) ?
     jne _case_j ; current letter != 105 (i in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesI
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesI
         
-    mov rdi, coordinatesI ; rdi => coordinatesI base address
+    mov r8, coordinatesI ; r8 => coordinatesI base address
     
     jmp _letter_cases_end
 
 _case_j:
-    cmp rdi, 106 ; current letter == 106 (j in ASCII) ?
+    cmp r8, 106 ; current letter == 106 (j in ASCII) ?
     jne _case_k ; current letter != 106 (j in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesJ
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesJ
         
-    mov rdi, coordinatesJ ; rdi => coordinatesJ base address
+    mov r8, coordinatesJ ; r8 => coordinatesJ base address
     
     jmp _letter_cases_end
 
 _case_k:
-    cmp rdi, 107 ; current letter == 107 (k in ASCII) ?
+    cmp r8, 107 ; current letter == 107 (k in ASCII) ?
     jne _case_l ; current letter != 107 (k in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesK
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesK
         
-    mov rdi, coordinatesK ; rdi => coordinatesK base address
+    mov r8, coordinatesK ; r8 => coordinatesK base address
     
     jmp _letter_cases_end
 
 _case_l:
-    cmp rdi, 108 ; current letter == 108 (l in ASCII) ?
+    cmp r8, 108 ; current letter == 108 (l in ASCII) ?
     jne _case_m ; current letter != 108 (l in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesL
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesL
         
-    mov rdi, coordinatesL ; rdi => coordinatesL base address
+    mov r8, coordinatesL ; r8 => coordinatesL base address
     
     jmp _letter_cases_end
 
 _case_m:
-    cmp rdi, 109 ; current letter == 109 (m in ASCII) ?
+    cmp r8, 109 ; current letter == 109 (m in ASCII) ?
     jne _case_n ; current letter != 109 (m in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesM
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesM
         
-    mov rdi, coordinatesM ; rdi => coordinatesM base address
+    mov r8, coordinatesM ; r8 => coordinatesM base address
     
     jmp _letter_cases_end
 
 _case_n:
-    cmp rdi, 110 ; current letter == 110 (n in ASCII) ?
+    cmp r8, 110 ; current letter == 110 (n in ASCII) ?
     jne _case_o ; current letter != 110 (n in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesN
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesN
         
-    mov rdi, coordinatesN ; rdi => coordinatesN base address
+    mov r8, coordinatesN ; r8 => coordinatesN base address
     
     jmp _letter_cases_end
 
 _case_o:
-    cmp rdi, 111 ; current letter == 111 (o in ASCII) ?
+    cmp r8, 111 ; current letter == 111 (o in ASCII) ?
     jne _case_p ; current letter != 111 (o in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesO
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesO
         
-    mov rdi, coordinatesO ; rdi => coordinatesO base address
+    mov r8, coordinatesO ; r8 => coordinatesO base address
     
     jmp _letter_cases_end
 
 _case_p:
-    cmp rdi, 112 ; current letter == 112 (p in ASCII) ?
+    cmp r8, 112 ; current letter == 112 (p in ASCII) ?
     jne _case_q ; current letter != 112 (p in ASCII) 
     
-    mov r8, 16 ; 8 coordinates or 16 elements in coordinatesP
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesP
         
-    mov rdi, coordinatesP ; rdi => coordinatesP base address
+    mov r8, coordinatesP ; r8 => coordinatesP base address
     
     jmp _letter_cases_end
 
 _case_q:
-    cmp rdi, 113 ; current letter == 113 (q in ASCII) ?
+    cmp r8, 113 ; current letter == 113 (q in ASCII) ?
     jne _case_r ; current letter != 113 (q in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesQ
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesQ
         
-    mov rdi, coordinatesQ ; rdi => coordinatesQ base address
+    mov r8, coordinatesQ ; r8 => coordinatesQ base address
     
     jmp _letter_cases_end
 
 _case_r:
-    cmp rdi, 114 ; current letter == 114 (r in ASCII) ?
+    cmp r8, 114 ; current letter == 114 (r in ASCII) ?
     jne _case_s ; current letter != 114 (r in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesR
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesR
         
-    mov rdi, coordinatesR ; rdi => coordinatesR base address
+    mov r8, coordinatesR ; r8 => coordinatesR base address
     
     jmp _letter_cases_end
 
 _case_s:
-    cmp rdi, 115 ; current letter == 115 (s in ASCII) ?
+    cmp r8, 115 ; current letter == 115 (s in ASCII) ?
     jne _case_t ; current letter != 115 (s in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesS
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesS
         
-    mov rdi, coordinatesS ; rdi => coordinatesS base address
+    mov r8, coordinatesS ; r8 => coordinatesS base address
     
     jmp _letter_cases_end
 
 _case_t:
-    cmp rdi, 116 ; current letter == 116 (t 116 in ASCII) ?
+    cmp r8, 116 ; current letter == 116 (t 116 in ASCII) ?
     jne _case_u ; current letter != 116 (t in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesT
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesT
         
-    mov rdi, coordinatesT ; rdi => coordinatesT base address
+    mov r8, coordinatesT ; r8 => coordinatesT base address
     
     jmp _letter_cases_end
 
 _case_u:
-    cmp rdi, 117 ; current letter == 117 (u in ASCII) ?
+    cmp r8, 117 ; current letter == 117 (u in ASCII) ?
     jne _case_v ; current letter != 117 (u in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesU
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesU
         
-    mov rdi, coordinatesU ; rdi => coordinatesU base address
+    mov r8, coordinatesU ; r8 => coordinatesU base address
     
     jmp _letter_cases_end
 
 _case_v:
-    cmp rdi, 118 ; current letter == 118 (v in ASCII) ?
+    cmp r8, 118 ; current letter == 118 (v in ASCII) ?
     jne _case_w ; current letter != 118 (v in ASCII) 
     
-    mov r8, 24 ; 12 coordinates or 24 elements in coordinatesV
+    mov r9, 24 ; 12 coordinates or 24 elements in coordinatesV
         
-    mov rdi, coordinatesV ; rdi => coordinatesV base address
+    mov r8, coordinatesV ; r8 => coordinatesV base address
     
     jmp _letter_cases_end
 
 _case_w:
-    cmp rdi, 119 ; current letter == 119 (w in ASCII) ?
+    cmp r8, 119 ; current letter == 119 (w in ASCII) ?
     jne _case_x ; current letter != 119 (w in ASCII) 
     
-    mov r8, 20 ; 10 coordinates or 20 elements in coordinatesW
+    mov r9, 20 ; 10 coordinates or 20 elements in coordinatesW
         
-    mov rdi, coordinatesW ; rdi => coordinatesW base address
+    mov r8, coordinatesW ; r8 => coordinatesW base address
     
     jmp _letter_cases_end
 
 _case_x:
-    cmp rdi, 120 ; current letter == 120 (x in ASCII) ?
+    cmp r8, 120 ; current letter == 120 (x in ASCII) ?
     jne _case_y ; current letter != 120 (x in ASCII) 
     
-    mov r8, 8 ; 4 coordinates or 8 elements in coordinatesX
+    mov r9, 8 ; 4 coordinates or 8 elements in coordinatesX
         
-    mov rdi, coordinatesX ; rdi => coordinatesX base address
+    mov r8, coordinatesX ; r8 => coordinatesX base address
     
     jmp _letter_cases_end
 
 _case_y:
-    cmp rdi, 121 ; current letter == 121 (y in ASCII) ?
+    cmp r8, 121 ; current letter == 121 (y in ASCII) ?
     jne _case_z ; current letter != 121 (y in ASCII) 
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesY
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesY
         
-    mov rdi, coordinatesY ; rdi => coordinatesY base address
+    mov r8, coordinatesY ; r8 => coordinatesY base address
     
     jmp _letter_cases_end
 
 _case_z:
     ; current letter = 122 (z in ASCII)
     
-    mov r8, 12 ; 6 coordinates or 12 elements in coordinatesZ
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesZ
         
-    mov rdi, coordinatesZ ; rdi => coordinatesZ base address    
+    mov r8, coordinatesZ ; r8 => coordinatesZ base address    
            
 _letter_cases_end:
     ret
