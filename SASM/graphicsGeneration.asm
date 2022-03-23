@@ -2,15 +2,15 @@
 
 section .bss
 
-text resb 1682 ; variable to store file contents
+text resb 1764 ; variable to store file contents
 
 section .data
 
-n equ 250 ; number of columns
+n equ 252 ; number of columns
 
 pixel db '0'
 
-matrix times 62500 db '1'
+matrix times 63504 db '1'
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
@@ -63,7 +63,7 @@ _create_output_text_file:
     int     80h ; call the kernel
     
 _write_output_text_file:
-    mov rdx, 62500 ; rdx = number of bytes to write
+    mov rdx, 63504 ; rdx = number of bytes to write
     mov rcx, matrix ; rcx = matrix base address
     mov rbx, rax ; rbx = file descriptor
     mov rax, 4 ; rax = SYS_WRITE
@@ -79,7 +79,7 @@ _read_input_text_file:
     mov     rax, 5 ; rax = 5
     int     80h ; call the kernel
 
-    mov     rdx, 1000 ; rdx => number of bytes to read
+    mov     rdx, 1764 ; rdx => number of bytes to read
     mov     rcx, text ; rcx = inputFileName address
     mov     rbx, rax ; rbx = rax
     mov     rax, 3 ; rax = 3
@@ -98,7 +98,7 @@ _loops_variables:
     mov rbx, 0 ; rbx => coordinates pointer (coordinates variable)
     mov rcx, 0 ; rcx => line pointer (line variable)
     mov rdx, 0 ; rdx => i (output file variable)  
-    mov rsi, 1000 ; rsi => j (output file variable)   
+    mov rsi, 1008 ; rsi => j (output file variable)   
     
 _letter_loop_start:  
     push rax ; preserve rax on the stack
@@ -466,7 +466,7 @@ _check_word_overflow_division:
     
     mov rdx, 0 ; rdx => residue
     
-    mov rbx, 1500 ; rbx => divider
+    mov rbx, 1512 ; rbx => divider
     
     div rbx ; rax = rax / rbx
     
@@ -477,15 +477,15 @@ _check_word_overflow_division:
     pop rbx ; restore rbx from the stack
     pop rax ; restore rax from the stack
     
-    imul r9, 41 ; r9 = division result * 41
+    imul r9, 42 ; r9 = division result * 42
     
-    sub r8, r9 ; r8 = final length - (division result * 41) => overflow
+    sub r8, r9 ; r8 = final length - (division result * 42) => overflow
     
-    cmp r8, 41 ; overflow > 41 ?
-    jle _check_word_overflow_end ; overflow =< 41
+    cmp r8, 42 ; overflow > 42 ?
+    jle _check_word_overflow_end ; overflow =< 42
         
     mov rdx, 0 ; i = 0
-    add rsi, 1500 ; j + 1500    
+    add rsi, 1512 ; j + 1512   
             
 _check_word_overflow_end:
     ret

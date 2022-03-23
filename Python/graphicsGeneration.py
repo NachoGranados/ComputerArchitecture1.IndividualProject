@@ -4,8 +4,8 @@ import cv2
 
 file = open("output.txt", "r")
 
-m = 250
-n = 250
+m = 252
+n = 252
 
 matrix = np.ones((m,n))
 
@@ -26,7 +26,7 @@ for line in file:
 
         i += 1
 
-        if i > 249:
+        if i > 251:
             i = 0
             j += 1        
 
