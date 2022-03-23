@@ -133,7 +133,7 @@ _pass_1:
     cmp r8, 32 ; current letter == 32 (" " in ASCII) ?
     jne _pass_2 ; current letter != 32 (" " in ASCII)   
                 
-    jmp _coordinates_loop_end
+    jmp _pass_3
     
 _pass_2:            
     call _letter_cases_start
@@ -142,109 +142,11 @@ _pass_2:
     
     ; r9 => letter flag
         
-    mov r10, 0 ; r10 => coordinates offset    
-    
-_coordinates_loop_start:
-    cmp rbx, r9 ; coordinates pointer < letter flag ?
-    jge _coordinates_loop_end ; coordinates pointer >= letter flag
-                 
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
-    push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack
-    push rsi ; preserve rsi on the stack
-    push rdi ; preserve rdi on the stack
-    push r8 ; preserve r8 on the stack
-    push r9 ; preserve r9 on the stack
-    
-    mov rax, r8 ; rax => coordinatesLetter base address
-    
-    movzx rdi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x1
-    inc r10 ; coordinates offset + 1
-    
-    movzx rsi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y1
-    inc r10 ; coordinates offset + 1
-        
-    movzx rdx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x2
-    inc r10 ; coordinates offset + 1
-    
-    movzx rcx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y2
-    inc r10 ; coordinates offset + 1
-        
-    push r10 ; preserve r10 on the stack   
-                   
-    call _bresenham
-    
-    ; r10 => number of coordinates of current line
-    
-    mov r11, r10 ; r11 = number of coordinates of current line
-      
-    pop r10 ; restore r10 from the stack
-    pop r9 ; restore r9 from the stack
-    pop r8 ; restore r8 from the stack
-    pop rdi ; restore rdi from the stack
-    pop rsi ; restore rsi from the stack
-    pop rdx ; restore rdx from the stack
-    pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
-    
-    mov r12, line ; r12 => line base address    
-    
-_line_loop_start:
-    cmp rcx, r11 ; line pointer < number of coordinates of current line ?
-    jge _line_loop_end ; line pointer >= number of coordinates of current line
-    
-    mov r13, rcx ; r13 => line pointer
-    
-    movzx r14, byte [r12 + r13] ; r14 = line[line pointer] => x
-    
-    inc r13 ; line pointer + 1
-    
-    movzx r15, byte [r12 + r13] ; r15 = line[line pointer] => y
-    
-    push rdx ; preserve rsi on the stack
-    push rsi ; preserve rdi on the stack
-    
-    add rdx, r14 ; rdx = i + x => i_new
-    
-    mov r14, n ; r14 = n
-    imul r14, r15 ; r14 = n * y
-    sub rsi, r14 ; rsi = j - (n * y) => j_new
-    
-    add rdx, rsi ; rdx = i_new + j_new
-    
-    mov r13, rdx ; r13 = i_new + j_new
-    
-    pop rsi ; restore rdi from the stack
-    pop rdx ; restore rsi from the stack 
-        
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
-    push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack    
-       
-    call _update_output_file         
-    
-    pop rdx ; restore rdx from the stack
-    pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
-    
-    add rcx, 2 ; line pointer + 2
-    
-    jmp _line_loop_start
+    mov r10, 0 ; r10 => coordinates offset
+           
+    call _draw_letter      
 
-_line_loop_end:
-
-    mov rcx, 0 ; line pointer = 0 
-
-    add rbx, 4 ; coordinates pointer + 4
-    
-    jmp _coordinates_loop_start
-
-_coordinates_loop_end:
-
+_pass_3:             
     mov rbx, 0 ; coordinates pointer = 0
 
     add rdx, 6 ; i + 6
@@ -269,6 +171,8 @@ _continue:
 
 _letter_loop_end:
 
+; **************************************
+
 _signature:
     mov rbx, 0 ; coordinates pointer = 0
 
@@ -278,106 +182,9 @@ _signature:
     
     mov r10, 0 ; r10 => coordinates offset
 
-_signature_coordinates_loop_start:
-    cmp rbx, r9 ; coordinates pointer < letter flag ?
-    jge _signature_coordinates_loop_end ; coordinates pointer >= letter flag
-                 
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
-    push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack
-    push rsi ; preserve rsi on the stack
-    push rdi ; preserve rdi on the stack
-    push r8 ; preserve r8 on the stack
-    push r9 ; preserve r9 on the stack
-    
-    mov rax, r8 ; rax => coordinatesLetter base address
-    
-    movzx rdi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x1
-    inc r10 ; coordinates offset + 1
-    
-    movzx rsi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y1
-    inc r10 ; coordinates offset + 1
-        
-    movzx rdx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x2
-    inc r10 ; coordinates offset + 1
-    
-    movzx rcx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y2
-    inc r10 ; coordinates offset + 1
-        
-    push r10 ; preserve r10 on the stack   
-                   
-    call _bresenham
-    
-    ; r10 => number of coordinates of current line
-    
-    mov r11, r10 ; r11 = number of coordinates of current line
-      
-    pop r10 ; restore r10 from the stack
-    pop r9 ; restore r9 from the stack
-    pop r8 ; restore r8 from the stack
-    pop rdi ; restore rdi from the stack
-    pop rsi ; restore rsi from the stack
-    pop rdx ; restore rdx from the stack
-    pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
-    
-    mov r12, line ; r12 => line base address    
-    
-_signature_line_loop_start:
-    cmp rcx, r11 ; line pointer < number of coordinates of current line ?
-    jge _signature_line_loop_end ; line pointer >= number of coordinates of current line
-    
-    mov r13, rcx ; r13 => line pointer
-    
-    movzx r14, byte [r12 + r13] ; r14 = line[line pointer] => x
-    
-    inc r13 ; line pointer + 1
-    
-    movzx r15, byte [r12 + r13] ; r15 = line[line pointer] => y
-    
-    push rdx ; preserve rsi on the stack
-    push rsi ; preserve rdi on the stack
-    
-    add rdx, r14 ; rdx = i + x => i_new
-    
-    mov r14, n ; r14 = n
-    imul r14, r15 ; r14 = n * y
-    sub rsi, r14 ; rsi = j - (n * y) => j_new
-    
-    add rdx, rsi ; rdx = i_new + j_new
-    
-    mov r13, rdx ; r13 = i_new + j_new
-    
-    pop rsi ; restore rdi from the stack
-    pop rdx ; restore rsi from the stack 
-        
-    push rax ; preserve rax on the stack
-    push rbx ; preserve rbx on the stack
-    push rcx ; preserve rcx on the stack
-    push rdx ; preserve rdx on the stack    
-       
-    call _update_output_file         
-    
-    pop rdx ; restore rdx from the stack
-    pop rcx ; restore rcx from the stack
-    pop rbx ; restore rbx from the stack
-    pop rax ; restore rax from the stack
-    
-    add rcx, 2 ; line pointer + 2
-    
-    jmp _signature_line_loop_start
+    call _draw_letter
 
-_signature_line_loop_end:
-
-    mov rcx, 0 ; line pointer = 0 
-
-    add rbx, 4 ; coordinates pointer + 4
-    
-    jmp _signature_coordinates_loop_start
-
-_signature_coordinates_loop_end:
+; **************************************
 
 _exit:
     mov rbx, 0 ; rbx = 0
@@ -449,59 +256,7 @@ _text_length_finished:
     
     pop rbx ; restore rbx from the stack 
     
-    ret  
-    
-; **************************************
-
-; rdi => letter counter by line                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-_check_word_overflow_start:
-    
-    call _word_length_start   
-       
-    ; r8 = word length
-    
-_check_word_overflow_division:    
-    mov r9, rdi ; r9 = letter counter by line
-    
-    add r9, r8 ; r9 = letter counter by line + word length => overflow
-    
-    cmp r9, 41 ; overflow > 41 ? 
-    jle _check_word_overflow_end ; overflow =< 41
-            
-    mov rdx, 0 ; i = 0
-    add rsi, 1512 ; j + 1512
-    
-    mov rdi, 0 ; letter counter by line = 0
-            
-_check_word_overflow_end:
-    ret
-
-; ************************************** 
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-; rax => letter pointer                                                                                                   
-_word_length_start:
-    mov r8, 0 ; r8 => word length   
-
-    mov r9, rax ; r9 = letter pointer
-    add r9, 1 ; r9 = letter pointer + 1
-    
-_word_length_loop:    
-    mov r10, text; r10 => text base address
-    
-    add r10, r9 ; r10 = text base address + letter pointer
-    
-    movzx r10, byte [r10] ; r10 => current letter
-    
-    cmp r10, 32 ; current letter > 32 (" " in ASCII) ?
-    jle _word_length_end ; current letter <= 32 (" " in ASCII)                
-              
-    add r8, 1 ; r8 = word length + 1
-    add r9, 1 ; r9 = letter pointer + 1     
-    
-    jmp _word_length_loop
-                                                                                                                          
-_word_length_end:
-    ret                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+    ret                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 ; **************************************                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
                                                                         
@@ -1049,8 +804,118 @@ _case_z:
 _letter_cases_end:
     ret
 
-; **************************************                                                                                                                                                                                       
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+; **************************************
+
+; rbx => coordinates pointer
+; r8 => coordinatesLetter base address
+; r9 => letter flag
+; r10 => coordinates offset
+_draw_letter:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+
+_coordinates_loop_start:
+    cmp rbx, r9 ; coordinates pointer < letter flag ?
+    jge _coordinates_loop_end ; coordinates pointer >= letter flag
+                 
+    push rax ; preserve rax on the stack
+    push rbx ; preserve rbx on the stack
+    push rcx ; preserve rcx on the stack
+    push rdx ; preserve rdx on the stack
+    push rsi ; preserve rsi on the stack
+    push rdi ; preserve rdi on the stack
+    push r8 ; preserve r8 on the stack
+    push r9 ; preserve r9 on the stack
+    
+    mov rax, r8 ; rax => coordinatesLetter base address
+    
+    movzx rdi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x1
+    inc r10 ; coordinates offset + 1
+    
+    movzx rsi, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y1
+    inc r10 ; coordinates offset + 1
+        
+    movzx rdx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = x2
+    inc r10 ; coordinates offset + 1
+    
+    movzx rcx, byte [rax + r10] ; coordinatesLetter[coordinates offset] = y2
+    inc r10 ; coordinates offset + 1
+        
+    push r10 ; preserve r10 on the stack   
+                   
+    call _bresenham
+    
+    ; r10 => number of coordinates of current line
+    
+    mov r11, r10 ; r11 = number of coordinates of current line
+      
+    pop r10 ; restore r10 from the stack
+    pop r9 ; restore r9 from the stack
+    pop r8 ; restore r8 from the stack
+    pop rdi ; restore rdi from the stack
+    pop rsi ; restore rsi from the stack
+    pop rdx ; restore rdx from the stack
+    pop rcx ; restore rcx from the stack
+    pop rbx ; restore rbx from the stack
+    pop rax ; restore rax from the stack
+    
+    mov r12, line ; r12 => line base address    
+    
+_line_loop_start:
+    cmp rcx, r11 ; line pointer < number of coordinates of current line ?
+    jge _line_loop_end ; line pointer >= number of coordinates of current line
+    
+    mov r13, rcx ; r13 => line pointer
+    
+    movzx r14, byte [r12 + r13] ; r14 = line[line pointer] => x
+    
+    inc r13 ; line pointer + 1
+    
+    movzx r15, byte [r12 + r13] ; r15 = line[line pointer] => y
+    
+    push rdx ; preserve rsi on the stack
+    push rsi ; preserve rdi on the stack
+    
+    add rdx, r14 ; rdx = i + x => i_new
+    
+    mov r14, n ; r14 = n
+    imul r14, r15 ; r14 = n * y
+    sub rsi, r14 ; rsi = j - (n * y) => j_new
+    
+    add rdx, rsi ; rdx = i_new + j_new
+    
+    mov r13, rdx ; r13 = i_new + j_new
+    
+    pop rsi ; restore rdi from the stack
+    pop rdx ; restore rsi from the stack 
+        
+    push rax ; preserve rax on the stack
+    push rbx ; preserve rbx on the stack
+    push rcx ; preserve rcx on the stack
+    push rdx ; preserve rdx on the stack    
+       
+    call _update_output_file         
+    
+    pop rdx ; restore rdx from the stack
+    pop rcx ; restore rcx from the stack
+    pop rbx ; restore rbx from the stack
+    pop rax ; restore rax from the stack
+    
+    add rcx, 2 ; line pointer + 2
+    
+    jmp _line_loop_start
+
+_line_loop_end:
+
+    mov rcx, 0 ; line pointer = 0 
+
+    add rbx, 4 ; coordinates pointer + 4
+    
+    jmp _coordinates_loop_start
+
+_coordinates_loop_end:
+    ret
+
+; **************************************                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 ; rdi = x1
 ; rsi = y1
 ; rdx = x2 
@@ -1248,5 +1113,57 @@ _update_output_file:
     mov     rax, 6 ; rax = SYS_CLOSE
     int     80h ; call the kernel
     
-    ret                                                       
+    ret       
+    
+; **************************************
+
+; rdi => letter counter by line                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+_check_word_overflow_start:
+    
+    call _word_length_start   
+       
+    ; r8 = word length
+    
+_check_word_overflow_division:    
+    mov r9, rdi ; r9 = letter counter by line
+    
+    add r9, r8 ; r9 = letter counter by line + word length => overflow
+    
+    cmp r9, 41 ; overflow > 41 ? 
+    jle _check_word_overflow_end ; overflow =< 41
+            
+    mov rdx, 0 ; i = 0
+    add rsi, 1512 ; j + 1512
+    
+    mov rdi, 0 ; letter counter by line = 0
+            
+_check_word_overflow_end:
+    ret
+
+; ************************************** 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+; rax => letter pointer                                                                                                   
+_word_length_start:
+    mov r8, 0 ; r8 => word length   
+
+    mov r9, rax ; r9 = letter pointer
+    add r9, 1 ; r9 = letter pointer + 1
+    
+_word_length_loop:    
+    mov r10, text; r10 => text base address
+    
+    add r10, r9 ; r10 = text base address + letter pointer
+    
+    movzx r10, byte [r10] ; r10 => current letter
+    
+    cmp r10, 32 ; current letter > 32 (" " in ASCII) ?
+    jle _word_length_end ; current letter <= 32 (" " in ASCII)                
+              
+    add r8, 1 ; r8 = word length + 1
+    add r9, 1 ; r9 = letter pointer + 1     
+    
+    jmp _word_length_loop
+                                                                                                                          
+_word_length_end:
+    ret                                                                                                     
                                                                     
