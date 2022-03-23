@@ -10,7 +10,7 @@ n equ 250 ; number of columns
 
 pixel db '0'
 
-matrix times 62500 db '`'
+matrix times 62500 db '1'
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
