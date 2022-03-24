@@ -14,7 +14,7 @@ matrix times 63504 db '1'
 
 inputFileName db 'input.txt', 0h
 outputFileName db 'output.txt', 0h 
-
+ 
 coordinatesComma db 2, 0, 3, 1
 coordinatesPoint db 1, 0, 2, 0, 1, 1, 2, 1
 
@@ -794,13 +794,144 @@ _case_y:
     
     jmp _letter_cases_end
 
-_case_z:
-    ; current letter = 122 (z in ASCII)
+_case_z:                                    
+    cmp r8, 122 ; current letter == 122 (z in ASCII) ?
+    jne _case_acute_letters ; current letter != 122 (z in ASCII) 
     
     mov r9, 12 ; 6 coordinates or 12 elements in coordinatesZ
         
-    mov r8, coordinatesZ ; r8 => coordinatesZ base address    
-           
+    mov r8, coordinatesZ ; r8 => coordinatesZ base address
+    
+    jmp _letter_cases_end                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+_case_acute_letters:
+    cmp r8, 195 ; current letter == 195 (acute letter in ASCII) ?
+    jne _letter_cases_end ; current letter != 195 (acute letter in ASCII)
+    
+    add rax, 1 ; letter pointer + 1
+    
+    mov r8, text ; r8 => text base address
+    add r8, rax ; r8 = text base address + letter pointer
+    
+    movzx r8, byte [r8] ; rdi => current letter
+                                                                                                 
+_case_acute_A:                                    
+    cmp r8, 129 ; current letter == 129 (Á in ASCII) ?
+    jne _case_acute_E ; current letter != 129 (Á in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesA
+        
+    mov r8, coordinatesA ; r8 => coordinatesA base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_E:                                     
+    cmp r8, 137 ; current letter == 137 (É in ASCII) ?
+    jne _case_acute_I ; current letter != 137 (É in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesE
+        
+    mov r8, coordinatesE ; r8 => coordinatesE base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_I:                                   
+    cmp r8, 141 ; current letter == 141 (Í in ASCII) ?
+    jne _case_acute_O ; current letter != 141 (Í in ASCII) 
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesI
+        
+    mov r8, coordinatesI ; r8 => coordinatesI base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_O:                                   
+    cmp r8, 147 ; current letter == 147 (Ó in ASCII) ?
+    jne _case_acute_U ; current letter != 147 (Ó in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesO
+        
+    mov r8, coordinatesO ; r8 => coordinatesO base address
+    
+    jmp _letter_cases_end                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                         
+_case_acute_U:                                   
+    cmp r8, 154 ; current letter == 154 (Ú in ASCII) ?
+    jne _case_acute_a ; current letter != 154 (Ú in ASCII) 
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesU
+        
+    mov r8, coordinatesU ; r8 => coordinatesU base address
+    
+    jmp _letter_cases_end                                                                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+_case_acute_a:                                    
+    cmp r8, 161 ; current letter == 161 (á in ASCII) ?
+    jne _case_acute_e ; current letter != 161 (á in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesA
+        
+    mov r8, coordinatesA ; r8 => coordinatesA base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_e:                                     
+    cmp r8, 169 ; current letter == 169 (é in ASCII) ?
+    jne _case_acute_i ; current letter != 169 (é in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesE
+        
+    mov r8, coordinatesE ; r8 => coordinatesE base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_i:                                   
+    cmp r8, 173 ; current letter == 173 (í in ASCII) ?
+    jne _case_acute_o ; current letter != 173 (í in ASCII) 
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesI
+        
+    mov r8, coordinatesI ; r8 => coordinatesI base address
+    
+    jmp _letter_cases_end 
+    
+_case_acute_o:                                   
+    cmp r8, 179 ; current letter == 179 (ó in ASCII) ?
+    jne _case_acute_u ; current letter != 179 (ó in ASCII) 
+    
+    mov r9, 16 ; 8 coordinates or 16 elements in coordinatesO
+        
+    mov r8, coordinatesO ; r8 => coordinatesO base address
+    
+    jmp _letter_cases_end                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+                                                                                                                         
+_case_acute_u:                                   
+    cmp r8, 186 ; current letter == 186 (ú in ASCII) ?
+    jne _case_acute_N ; current letter != 186 (ú in ASCII) 
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesU
+        
+    mov r8, coordinatesU ; r8 => coordinatesU base address
+    
+    jmp _letter_cases_end                                                                                                                                                                      
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+ _case_acute_N:                                   
+    cmp r8, 145 ; current letter == 145 (Ñ in ASCII) ?
+    jne _case_acute_n ; current letter != 145 (Ñ in ASCII) 
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesN
+        
+    mov r8, coordinatesN ; r8 => coordinatesN base address
+    
+    jmp _letter_cases_end
+                                                                                                                                                                                                                            
+_case_acute_n:                                   
+    ; current letter = 177 (ñ in ASCII)
+    
+    mov r9, 12 ; 6 coordinates or 12 elements in coordinatesN
+        
+    mov r8, coordinatesN ; r8 => coordinatesN base address
+                                                                                                                                                                                                                                                                       
 _letter_cases_end:
     ret
 

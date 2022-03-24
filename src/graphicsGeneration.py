@@ -4,13 +4,15 @@ import cv2
 
 file = open("output.txt", "r")
 
-m = 252 # rows quantity
-n = 252 # columns quantity
+m = 253 # rows quantity
+n = 253 # columns quantity
 
-matrix = np.ones((m,n))
+matrix = np.ones((m,n)) # matrix creation
 
-i = 0 # row variable
-j = 0 # column variable
+matrix *= 255 # paint all matrix elements with white
+
+i = 1 # row variable
+j = 1 # column variable
 
 for line in file:
 
@@ -18,14 +20,14 @@ for line in file:
 
         num = int(char) # string to int
 
-        num *= 255 # color of the letters
+        num *= 255 # color of the background
 
         matrix[i][j] = num # sotre current num into matrix
 
         i += 1
 
-        if i > 251: # new line
-            i = 0
+        if i > 252: # new line
+            i = 1
             j += 1        
 
 
@@ -40,3 +42,4 @@ file.close
 print("")
 print("Done")
 print("")
+
