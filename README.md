@@ -1,3 +1,4 @@
+<pre>
 Este generador de gráficos, fue diseñado, codificado y probado en el sistema operativo Ubuntu 20.04 de Linux.
 
 Para el desarrollo del proyecto en cuestión, se utilizaron las siguientes herramientas que permitieron compilar, ejecutar y revisar el correcto funcionamiento de aplicación desarrollada:
@@ -34,4 +35,4 @@ Para compilar y ejecutar el proyecto actual, debe realizar los siguientes pasos:
 	9- Dentro del IDE de Visual Studio Code, debe abrir la carpeta descomprimida del proyecto actual.
 	10- Dentro del IDE de Visual Studio Code, debe abrir el archivo "graphicsGeneration.py" y seguidamente presione el botón 
 	    de "Run Python File". Esto generará el archivo "Result.png", el cual mostrará la imagen final del texto digitado.
-	    
+<pre>
